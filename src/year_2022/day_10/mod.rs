@@ -1,5 +1,3 @@
-use std::io::{BufRead, BufReader};
-
 use crate::{print_challange_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");

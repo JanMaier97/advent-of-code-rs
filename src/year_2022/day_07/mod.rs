@@ -1,5 +1,3 @@
-use std::io::{BufRead, BufReader};
-
 use once_cell::sync::OnceCell;
 use regex::Regex;
 
@@ -19,7 +17,7 @@ const REQUIRED_DISK_SPACE: u32 = 30000000;
 
 #[derive(Debug)]
 enum LineTypes {
-    DirLabel((String)),
+    DirLabel(String),
     File((String, u32)),
     Dir((String, u32)),
 }
@@ -44,11 +42,6 @@ fn solve_part_two(input: &str) -> MyResult<u32> {
     let (_, directories, used_disk_space) = solve_function_thats_way_to_big(input)?;
     let unused_disk_space = MAX_DISK_SPACE - used_disk_space;
     let min_dir_size_to_delete = REQUIRED_DISK_SPACE - unused_disk_space;
-
-    let size = directories
-        .iter()
-        .filter(|&&size| size > min_dir_size_to_delete)
-        .collect::<Vec<_>>();
 
     let size = directories
         .into_iter()
@@ -88,7 +81,7 @@ fn solve_function_thats_way_to_big(input: &str) -> MyResult<(u32, Vec<u32>, u32)
     LS_REGEX.get_or_init(|| Regex::new(r"/^\$ ls$").unwrap());
 
     let file_regex = FILE_REGEX.get_or_init(|| Regex::new(r"^(\d+) (.+)$").unwrap());
-    let dir_regex = DIR_REGEX.get_or_init(|| Regex::new(r"^dir (.)$").unwrap());
+    let _dir_regex = DIR_REGEX.get_or_init(|| Regex::new(r"^dir (.)$").unwrap());
     let cd_regex = CD_REGEX.get_or_init(|| Regex::new(r"^\$ cd (\w+|/)$").unwrap());
     let cd_up_regex = CD_UP_REGEX.get_or_init(|| Regex::new(r"^\$ cd \.\.$").unwrap());
 
@@ -104,7 +97,7 @@ fn solve_function_thats_way_to_big(input: &str) -> MyResult<(u32, Vec<u32>, u32)
             continue;
         }
 
-        if let Some(d) = file_regex.captures(&line) {
+        if let Some(_) = file_regex.captures(&line) {
             // let dir_name = d.get(1).unwrap().as_str();
             // stack.push(LineTypes::DirLabel(dir_name.to_string()));
             continue;
@@ -130,7 +123,7 @@ fn solve_function_thats_way_to_big(input: &str) -> MyResult<(u32, Vec<u32>, u32)
     }
 
     match stack.first().unwrap() {
-        LineTypes::Dir((label, size)) => Ok((summed_dir_size, directories, *size)),
+        LineTypes::Dir((_, size)) => Ok((summed_dir_size, directories, *size)),
         _ => Err("invalid rood dir".into()),
     }
 }

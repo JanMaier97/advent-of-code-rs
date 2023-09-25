@@ -1,7 +1,4 @@
-use std::{
-    collections::HashSet,
-    io::{BufRead, BufReader},
-};
+use std::collections::HashSet;
 
 use itertools::Itertools;
 
@@ -165,14 +162,14 @@ pub fn solve() -> MyResult<()> {
     print_challange_header(12);
     println!("Skipping for performance...");
 
-    // println!(
-    //     "1) The fewest steps to the location is {}",
-    //     solve_part_one(INPUT_FILE)?
-    // );
-    // println!(
-    //     "2) The fewest steps to the location is {}",
-    //     solve_part_two(INPUT_FILE)?
-    // );
+    println!(
+        "1) The fewest steps to the location is {}",
+        solve_part_one(INPUT)?
+    );
+    println!(
+        "2) The fewest steps to the location is {}",
+        solve_part_two(INPUT)?
+    );
 
     Ok(())
 }

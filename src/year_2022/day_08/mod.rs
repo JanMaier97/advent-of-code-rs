@@ -1,5 +1,3 @@
-use std::io::{BufRead, BufReader};
-
 use itertools::Itertools;
 
 use crate::{print_challange_header, MyResult};
@@ -38,10 +36,7 @@ pub fn solve() -> MyResult<()> {
         "The number of visible trees is {}",
         solve_first_part(INPUT)?
     );
-    println!(
-        "The highest scenic score is {}",
-        solve_second_part(INPUT)?
-    );
+    println!("The highest scenic score is {}", solve_second_part(INPUT)?);
 
     Ok(())
 }
@@ -75,11 +70,11 @@ fn solve_second_part(input: &str) -> MyResult<u32> {
 }
 
 fn compute_view_score_for_tree(grid: &Grid<u32>, row_idx: usize, col_idx: usize) -> MyResult<u32> {
-    let Some(row) = grid.items.get(row_idx) else{
+    let Some(row) = grid.items.get(row_idx) else {
         return Err("invalid row index".into());
     };
 
-    let Some(tree_size) = row.get(col_idx) else{
+    let Some(tree_size) = row.get(col_idx) else {
         return Err("invalid column index".into());
     };
 
@@ -122,11 +117,11 @@ fn compute_view_score_for_tree(grid: &Grid<u32>, row_idx: usize, col_idx: usize)
 }
 
 fn field_is_visible(grid: &Grid<u32>, row_idx: usize, col_idx: usize) -> MyResult<bool> {
-    let Some(row) = grid.items.get(row_idx) else{
+    let Some(row) = grid.items.get(row_idx) else {
         return Err("invalid row index".into());
     };
 
-    let Some(tree_size) = row.get(col_idx) else{
+    let Some(tree_size) = row.get(col_idx) else {
         return Err("invalid column index".into());
     };
 

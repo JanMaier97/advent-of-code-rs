@@ -1,7 +1,5 @@
-use std::{
-    collections::VecDeque,
-    io::{BufRead, BufReader},
-};
+use std::cmp::Ordering;
+use std::collections::VecDeque;
 
 use itertools::Itertools;
 
@@ -115,7 +113,7 @@ fn resolve_tokens(tokens: &mut VecDeque<String>) -> MyResult<PacketData> {
 
     loop {
         let Some(token) = tokens.pop_front() else {
-            return Ok(result_stack.first().unwrap().clone())
+            return Ok(result_stack.first().unwrap().clone());
         };
 
         match token.as_str() {
@@ -137,15 +135,11 @@ fn resolve_tokens(tokens: &mut VecDeque<String>) -> MyResult<PacketData> {
 
 fn compare_packets(left: &PacketData, right: &PacketData) -> CompareResult {
     match (left, right) {
-        (Value(l), Value(r)) => {
-            if *l < *r {
-                Valid
-            } else if *l == *r {
-                Equivalent
-            } else {
-                Invalid
-            }
-        }
+        (Value(l), Value(r)) => match l.cmp(r) {
+            Ordering::Less => Valid,
+            Ordering::Equal => Equivalent,
+            Ordering::Greater => Invalid,
+        },
         (List(left), List(right)) => {
             if right.len() < left.len() {
                 return Invalid;
@@ -165,7 +159,7 @@ fn compare_packets(left: &PacketData, right: &PacketData) -> CompareResult {
             if let Some(first_left_val) = left.first() {
                 let r = compare_packets(first_left_val, right);
                 if r == Equivalent {
-                    return Valid;
+                    Valid
                 } else {
                     r
                 }
@@ -177,7 +171,7 @@ fn compare_packets(left: &PacketData, right: &PacketData) -> CompareResult {
             if let Some(first_right_val) = right.first() {
                 let r = compare_packets(left, first_right_val);
                 if r == Equivalent {
-                    return Valid;
+                    Valid
                 } else {
                     r
                 }
@@ -185,7 +179,6 @@ fn compare_packets(left: &PacketData, right: &PacketData) -> CompareResult {
                 Valid
             }
         }
-        _ => todo!(),
     }
 }
 

@@ -1,7 +1,4 @@
-use std::{
-    collections::VecDeque,
-    io::{BufRead, BufReader},
-};
+use std::collections::VecDeque;
 
 use itertools::Itertools;
 use num::{BigUint, Zero};
@@ -125,11 +122,10 @@ pub fn solve() -> MyResult<()> {
         "1) The level of monkey business is {}",
         solve_part_one(INPUT)?
     );
-    println!("1) The level of monkey bisunies is SKIPPED");
-    // println!(
-    //     "2) The level of monkey business is {}",
-    //     solve_part_two(INPUT_FILE)?
-    // );
+    println!(
+        "2) the level of monkey business is {}",
+        solve_part_two(INPUT)?
+    );
 
     Ok(())
 }
@@ -250,10 +246,11 @@ mod tests {
         assert_eq!(result.unwrap(), 182293);
     }
 
-    // #[test]
-    fn solve_part_two_example() {
-        let result = solve_part_two(EXAMPLE_INPUT);
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 2713310158);
-    }
+    // text executions takes too long
+    //    #[test]
+    //    fn solve_part_two_example() {
+    //        let result = solve_part_two(EXAMPLE_INPUT);
+    //        assert!(result.is_ok());
+    //        assert_eq!(result.unwrap(), 2713310158);
+    //    }
 }

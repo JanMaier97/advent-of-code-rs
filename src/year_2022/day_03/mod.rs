@@ -47,19 +47,22 @@ fn calculate_priority_sum_for_badges(input: &str) -> MyResult<u32> {
     let mut priority_sum = 0;
 
     for chunk in &input.lines().chunks(3) {
+        let sets = chunk
+            .map(|line| line.chars().collect::<HashSet<_>>())
+            .collect_vec();
 
-        let sets = chunk.map(|line| line.chars().collect::<HashSet<_>>()).collect_vec();
-
-        let union = sets.into_iter().reduce(|acc, e| acc.intersection(&e).cloned().collect::<HashSet<_>>()).unwrap();
+        let union = sets
+            .into_iter()
+            .reduce(|acc, e| acc.intersection(&e).cloned().collect::<HashSet<_>>())
+            .unwrap();
 
         println!("Items for current chunk");
-       priority_sum += union
-           .iter()
-           .inspect(|c| print!("{}", c))
-           .map(|c| get_priority_for_item(*c))
-           .sum::<u32>();
-           println!();
-
+        priority_sum += union
+            .iter()
+            .inspect(|c| print!("{}", c))
+            .map(|c| get_priority_for_item(*c))
+            .sum::<u32>();
+        println!();
 
         // let chunk = chunk.collect::<Result<Vec<String>, _>>()?;
         // let mut all_items = Vec::new();

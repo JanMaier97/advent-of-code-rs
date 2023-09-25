@@ -1,5 +1,3 @@
-use std::io::{BufReader, Read};
-
 use itertools::Itertools;
 
 use crate::{print_challange_header, MyResult};

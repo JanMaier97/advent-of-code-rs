@@ -1,9 +1,4 @@
-use std::{
-    collections::HashSet,
-    io::{BufRead, BufReader},
-};
-
-use itertools::Itertools;
+use std::collections::HashSet;
 
 use crate::{print_challange_header, MyResult};
 
@@ -115,19 +110,6 @@ fn solve_second_part(input: &str) -> MyResult<u32> {
     }
 
     Ok(visited_positions.len() as u32)
-}
-
-fn print_board(knots: &[(i32, i32)]) {
-    for row in (0..5i32).rev() {
-        for col in 0..6i32 {
-            let Some((index, _)) = knots.iter().find_position(|&&knot| knot == (col, row)) else {
-                print!(".");
-                continue;
-            };
-            print!("{}", index);
-        }
-        print!("\n");
-    }
 }
 
 #[cfg(test)]

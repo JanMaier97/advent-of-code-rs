@@ -53,8 +53,8 @@ fn calculate_solution_part_two(input: &str) -> MyResult<u32> {
 
 fn parse_range_pair(input: &str) -> MyResult<((u32, u32), (u32, u32))> {
     let Some((range_1, range_2)) = input.split_once(',') else {
-            return Err("Invalid format".into());
-        };
+        return Err("Invalid format".into());
+    };
 
     let range_1 = parse_range(range_1)?;
     let range_2 = parse_range(range_2)?;
@@ -64,8 +64,8 @@ fn parse_range_pair(input: &str) -> MyResult<((u32, u32), (u32, u32))> {
 
 fn parse_range(range: &str) -> MyResult<(u32, u32)> {
     let Some((lower_bound, upper_bound)) = range.split_once('-') else {
-            return Err("Invalid range".into());
-        };
+        return Err("Invalid range".into());
+    };
 
     Ok((lower_bound.parse()?, upper_bound.parse()?))
 }

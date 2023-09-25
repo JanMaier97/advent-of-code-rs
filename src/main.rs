@@ -6,18 +6,18 @@ type MyResult<T> = Result<T, Box<dyn Error>>;
 
 fn main() -> MyResult<()> {
     year_2022::day_01::solve()?;
-     year_2022::day_02::solve()?;
-     year_2022::day_03::solve()?;
-     year_2022::day_04::solve()?;
-     year_2022::day_05::solve()?;
-     year_2022::day_06::solve()?;
-     year_2022::day_07::solve()?;
-     year_2022::day_08::solve()?;
-     year_2022::day_09::solve()?;
-     year_2022::day_10::solve()?;
-     year_2022::day_11::solve()?;
-     year_2022::day_12::solve()?;
-     year_2022::day_13::solve()?;
+    year_2022::day_02::solve()?;
+    year_2022::day_03::solve()?;
+    year_2022::day_04::solve()?;
+    year_2022::day_05::solve()?;
+    year_2022::day_06::solve()?;
+    year_2022::day_07::solve()?;
+    year_2022::day_08::solve()?;
+    year_2022::day_09::solve()?;
+    year_2022::day_10::solve()?;
+    year_2022::day_11::solve()?;
+    year_2022::day_12::solve()?;
+    year_2022::day_13::solve()?;
 
     Ok(())
 }
