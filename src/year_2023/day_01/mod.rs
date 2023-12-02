@@ -1,7 +1,5 @@
 use std::{cmp::max, collections::HashSet};
 
-use itertools::Itertools;
-
 use crate::{print_challange_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
@@ -86,21 +84,30 @@ fn find_raw_digits(line: &str) -> Vec<Digit> {
 }
 
 fn find_spelled_digits(line: &str) -> HashSet<Digit> {
-    let mut res = HashSet::new();
-
-    for (digit_value, digit_name) in SPELLED_DIGIT.into_iter().enumerate() {
-        let windows = sliding_windows(line, digit_name.len());
-        for (index, window) in windows.into_iter().enumerate() {
-            if window == digit_name {
-                res.insert(Digit {
-                    value: digit_value + 1,
-                    index,
-                });
-            }
-        }
-    }
+    let res = SPELLED_DIGIT
+        .into_iter()
+        .enumerate()
+        .map(|(index, name)| (index + 1, name, sliding_windows(line, name.len())))
+        .flat_map(|(value, name, windows)| collect_digits_from_windows(value, name, &windows))
+        .collect::<HashSet<_>>();
 
     return res;
+}
+
+fn collect_digits_from_windows(
+    digit_value: usize,
+    digit_name: &str,
+    windows: &[String],
+) -> Vec<Digit> {
+    windows
+        .into_iter()
+        .enumerate()
+        .filter(|(_, window)| *window == digit_name)
+        .map(|(index, _)| Digit {
+            value: digit_value,
+            index,
+        })
+        .collect::<Vec<_>>()
 }
 
 fn sliding_windows(line: &str, window_size: usize) -> Vec<String> {
