@@ -2,10 +2,12 @@ use std::{cmp::max, collections::HashSet};
 
 use itertools::Itertools;
 
-use crate::{MyResult, print_challange_header};
+use crate::{print_challange_header, MyResult};
 
-const INPUT: &str =  include_str!("input.txt");
-const SPELLED_DIGIT: [&str; 9] =  ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+const INPUT: &str = include_str!("input.txt");
+const SPELLED_DIGIT: [&str; 9] = [
+    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+];
 
 #[derive(Debug, Hash, Eq)]
 struct Digit {
@@ -18,7 +20,6 @@ impl PartialEq for Digit {
         self.value == other.value && self.index == other.index
     }
 }
-
 
 pub fn solve() -> MyResult<()> {
     print_challange_header(1);
@@ -37,27 +38,22 @@ fn solve_part_one(input: &str) -> MyResult<i32> {
     for line in input.lines() {
         let chars = line.chars();
         let mut numbers = Vec::new();
-        
+
         for c in chars {
             if c.is_numeric() {
                 numbers.push(c);
             }
         }
-        
+
         let num = format!("{}{}", numbers.first().unwrap(), numbers.last().unwrap());
 
         result.push(num.parse::<i32>().unwrap());
     }
 
-
-    let sum = result.
-        into_iter()
-        .reduce(|acc, e| acc + e)
-        .unwrap();
+    let sum = result.into_iter().reduce(|acc, e| acc + e).unwrap();
 
     Ok(sum)
 }
-
 
 fn solve_part_two(input: &str) -> MyResult<usize> {
     let mut sum = 0;
@@ -69,7 +65,7 @@ fn solve_part_two(input: &str) -> MyResult<usize> {
         let mut digits = digits.into_iter().collect_vec();
 
         digits.sort_by(|a, b| Ord::cmp(&a.index, &b.index));
-        
+
         let first_digit = digits.first().unwrap();
         let last_digit = digits.last().unwrap();
 
@@ -82,10 +78,11 @@ fn solve_part_two(input: &str) -> MyResult<usize> {
 }
 
 fn find_raw_digits(line: &str) -> HashSet<Digit> {
-    let res = line.chars()
+    let res = line
+        .chars()
         .map(|c| c.to_string().parse::<usize>().ok())
         .enumerate()
-        .map(|(index, option)| option.map(|value| Digit { value, index }) )
+        .map(|(index, option)| option.map(|value| Digit { value, index }))
         .flatten()
         .collect::<HashSet<_>>();
 
@@ -94,44 +91,46 @@ fn find_raw_digits(line: &str) -> HashSet<Digit> {
 
 fn find_spelled_digits(line: &str) -> HashSet<Digit> {
     let mut res = HashSet::new();
-    
+
     for (digit_value, digit_name) in SPELLED_DIGIT.into_iter().enumerate() {
         let windows = sliding_windows(line, digit_name.len());
         for (index, window) in windows.into_iter().enumerate() {
             if window == digit_name {
-                res.insert(Digit { value: digit_value +1, index});
+                res.insert(Digit {
+                    value: digit_value + 1,
+                    index,
+                });
             }
         }
     }
 
-
     return res;
 }
 
-
-
-fn sliding_windows(line: &str, window_size: usize) -> Vec::<String> {
+fn sliding_windows(line: &str, window_size: usize) -> Vec<String> {
     let window_count = line.len().saturating_sub(window_size) + 1;
     let window_count = max(window_count, 1);
-    
+
     let mut windows = Vec::new();
     for window_index in 0..window_count {
-        let window = line.chars().skip(window_index).take(window_size).collect::<String>();
+        let window = line
+            .chars()
+            .skip(window_index)
+            .take(window_size)
+            .collect::<String>();
         windows.push(window);
     }
 
     windows
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
 
-    use crate::year_2023::day_01::Digit;
     use crate::year_2023::day_01::find_spelled_digits;
     use crate::year_2023::day_01::solve_part_two;
+    use crate::year_2023::day_01::Digit;
 
     use super::sliding_windows;
     use super::solve_part_one;
@@ -168,18 +167,20 @@ mod tests {
         assert_eq!(result.unwrap(), 54087);
     }
 
-        #[test]
+    #[test]
     fn find_spelled_digits_correct() {
         let input = "dqfournine5four2jmlqcgv";
         let result = find_spelled_digits(input);
 
-        let expected_values= vec![
-            Digit { value: 4, index: 2},
-            Digit { value: 9, index: 6},
-            Digit { value: 4, index: 11},
+        let expected_values = vec![
+            Digit { value: 4, index: 2 },
+            Digit { value: 9, index: 6 },
+            Digit {
+                value: 4,
+                index: 11,
+            },
         ];
         let expected = HashSet::from_iter(expected_values);
-
 
         assert_eq!(result, expected);
     }
@@ -194,36 +195,15 @@ mod tests {
         assert_eq!(windows, expected);
     }
 
-
     #[test]
     fn sliding_windows_correct() {
         let input = "dqfournine5four2jmlqcgv";
         let expected = vec![
-            "dqfo",
-            "qfou",
-            "four",
-            "ourn",
-            "urni",
-            "rnin",
-            "nine",
-            "ine5",
-            "ne5f",
-            "e5fo",
-            "5fou",
-            "four",
-            "our2",
-            "ur2j",
-            "r2jm",
-            "2jml",
-            "jmlq",
-            "mlqc",
-            "lqcg",
-            "qcgv",
+            "dqfo", "qfou", "four", "ourn", "urni", "rnin", "nine", "ine5", "ne5f", "e5fo", "5fou",
+            "four", "our2", "ur2j", "r2jm", "2jml", "jmlq", "mlqc", "lqcg", "qcgv",
         ];
         let windows = sliding_windows(input, 4);
 
         assert_eq!(windows, expected);
     }
-
 }
-
