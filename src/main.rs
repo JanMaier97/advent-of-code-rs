@@ -1,6 +1,7 @@
 use std::error::Error;
 
 mod year_2022;
+mod year_2023;
 
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -18,6 +19,8 @@ fn main() -> MyResult<()> {
     year_2022::day_11::solve()?;
     year_2022::day_12::solve()?;
     year_2022::day_13::solve()?;
+
+    year_2023::day_01::solve()?;
 
     Ok(())
 }
