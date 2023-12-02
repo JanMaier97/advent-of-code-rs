@@ -34,38 +34,43 @@ pub fn solve() -> MyResult<()> {
 }
 
 fn solve_part_one(input: &str) -> MyResult<usize> {
-    Ok(compute_value(input, find_raw_digits))
+    compute_value(input, find_raw_digits)
 }
 
 fn solve_part_two(input: &str) -> MyResult<usize> {
-    Ok(compute_value(input, find_raw_and_spelled_digits))
+    compute_value(input, find_raw_and_spelled_digits)
 }
 
-fn compute_value<F>(input: &str, digit_finder: F) -> usize 
-where F : Fn(&str) -> Vec<Digit>
+fn compute_value<F>(input: &str, digit_finder: F) -> MyResult<usize>
+where
+    F: Fn(&str) -> Vec<Digit>,
 {
     let sum = input
         .lines()
         .map(|l| digit_finder(l))
-        .fold(0, |sum, digit| sum + compute_value_of_digits(&digit));
+        .map(|digits| compute_value_of_digits(&digits))
+        .collect::<MyResult<Vec<_>>>()?
+        .into_iter()
+        .sum();
 
-    sum
+    Ok(sum)
 }
 
 fn find_raw_and_spelled_digits(line: &str) -> Vec<Digit> {
-        let mut digits = find_raw_digits(line);
+    let mut digits = find_raw_digits(line);
 
-        digits.extend(find_spelled_digits(line));
-        digits.sort_by(|a, b| Ord::cmp(&a.index, &b.index));
+    digits.extend(find_spelled_digits(line));
+    digits.sort_by(|a, b| Ord::cmp(&a.index, &b.index));
 
-        digits
+    digits
 }
 
-fn compute_value_of_digits( digits: &[Digit]) -> usize {
-        let first_digit = digits.first().unwrap();
-        let last_digit = digits.last().unwrap();
+fn compute_value_of_digits(digits: &[Digit]) -> MyResult<usize> {
+    let first_digit = digits.first().ok_or("No digits found in line")?;
+    let last_digit = digits.last().ok_or("No digits found in line")?;
 
-        first_digit.value * 10 + last_digit.value
+    let value = first_digit.value * 10 + last_digit.value;
+    Ok(value)
 }
 
 fn find_raw_digits(line: &str) -> Vec<Digit> {
