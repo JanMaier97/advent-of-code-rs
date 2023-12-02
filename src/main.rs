@@ -20,7 +20,7 @@ fn main() -> MyResult<()> {
     year_2022::day_12::solve()?;
     year_2022::day_13::solve()?;
 
-    year_2023::day_01::solve()?;
+    year_2023::run()?;
 
     Ok(())
 }
