@@ -33,24 +33,12 @@ pub fn solve() -> MyResult<()> {
     Ok(())
 }
 
-fn solve_part_one(input: &str) -> MyResult<i32> {
-    let mut result = Vec::new();
+fn solve_part_one(input: &str) -> MyResult<usize> {
+    let mut sum = 0;
     for line in input.lines() {
-        let chars = line.chars();
-        let mut numbers = Vec::new();
-
-        for c in chars {
-            if c.is_numeric() {
-                numbers.push(c);
-            }
-        }
-
-        let num = format!("{}{}", numbers.first().unwrap(), numbers.last().unwrap());
-
-        result.push(num.parse::<i32>().unwrap());
+        let digits = find_raw_digits(line);
+        sum += compute_value_of_digits(&digits);
     }
-
-    let sum = result.into_iter().reduce(|acc, e| acc + e).unwrap();
 
     Ok(sum)
 }
@@ -63,28 +51,29 @@ fn solve_part_two(input: &str) -> MyResult<usize> {
         digits.extend(find_spelled_digits(line));
 
         let mut digits = digits.into_iter().collect_vec();
-
         digits.sort_by(|a, b| Ord::cmp(&a.index, &b.index));
 
-        let first_digit = digits.first().unwrap();
-        let last_digit = digits.last().unwrap();
-
-        let combined_digits = first_digit.value * 10 + last_digit.value;
-
-        sum += combined_digits;
+        sum += compute_value_of_digits(&digits);
     }
 
     Ok(sum)
 }
 
-fn find_raw_digits(line: &str) -> HashSet<Digit> {
+fn compute_value_of_digits( digits: &[Digit]) -> usize {
+        let first_digit = digits.first().unwrap();
+        let last_digit = digits.last().unwrap();
+
+        first_digit.value * 10 + last_digit.value
+}
+
+fn find_raw_digits(line: &str) -> Vec<Digit> {
     let res = line
         .chars()
         .map(|c| c.to_string().parse::<usize>().ok())
         .enumerate()
         .map(|(index, option)| option.map(|value| Digit { value, index }))
         .flatten()
-        .collect::<HashSet<_>>();
+        .collect::<Vec<_>>();
 
     return res;
 }
