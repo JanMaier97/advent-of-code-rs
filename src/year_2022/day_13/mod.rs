@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 
 use itertools::Itertools;
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 use CompareResult::*;
 use PacketData::*;
@@ -24,7 +24,7 @@ enum CompareResult {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(13);
+    print_challenge_header(13);
 
     println!("The sum of indices is {}", solve_part_one(INPUT)?);
 

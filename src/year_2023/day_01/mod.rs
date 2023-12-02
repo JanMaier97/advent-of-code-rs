@@ -1,6 +1,6 @@
 use std::{cmp::max, collections::HashSet};
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 const SPELLED_DIGIT: [&str; 9] = [
@@ -20,7 +20,7 @@ impl PartialEq for Digit {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(1);
+    print_challenge_header(1);
 
     let part_one_result = solve_part_one(INPUT)?;
     println!("Result for part one is {}", part_one_result);

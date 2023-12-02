@@ -1,12 +1,12 @@
 use itertools::Itertools;
 use regex::Regex;
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(5);
+    print_challenge_header(5);
 
     println!(
         "1) The crates at the top of each stacks are {}",

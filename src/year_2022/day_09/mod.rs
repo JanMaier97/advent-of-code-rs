@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -13,7 +13,7 @@ enum Direction {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(9);
+    print_challenge_header(9);
 
     println!(
         "1) The number of position visited at least once is {}",

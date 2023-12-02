@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use itertools::Itertools;
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -159,7 +159,7 @@ impl Map {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(12);
+    print_challenge_header(12);
     println!("Skipping for performance...");
 
     println!(

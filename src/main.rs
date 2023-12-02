@@ -12,7 +12,7 @@ fn main() -> MyResult<()> {
     Ok(())
 }
 
-fn print_challange_header(day: usize) {
+fn print_challenge_header(day: usize) {
     let day_label = format!("Day {:02}", day);
     let horizontal_border = "#".repeat(50);
 

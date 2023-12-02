@@ -2,12 +2,12 @@ use std::collections::HashSet;
 
 use itertools::Itertools;
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(3);
+    print_challenge_header(3);
 
     println!(
         "The sum of priorities of items found in both compartments is {}",

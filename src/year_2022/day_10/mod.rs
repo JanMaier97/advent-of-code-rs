@@ -1,4 +1,4 @@
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -9,7 +9,7 @@ enum Instruction {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(10);
+    print_challenge_header(10);
 
     println!(
         "1) The aggregated signal strenth is {}",

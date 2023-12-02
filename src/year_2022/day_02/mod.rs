@@ -1,9 +1,9 @@
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(2);
+    print_challenge_header(2);
     let total_score_by_move = calculate_total_score_by_move(INPUT)?;
     let total_score_by_result = calculate_total_score_by_round_result(INPUT)?;
 

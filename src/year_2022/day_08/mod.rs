@@ -1,6 +1,6 @@
 use itertools::Itertools;
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -30,7 +30,7 @@ impl<T> Grid<T> {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(8);
+    print_challenge_header(8);
 
     println!(
         "The number of visible trees is {}",

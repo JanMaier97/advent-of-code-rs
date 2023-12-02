@@ -1,4 +1,4 @@
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -23,7 +23,7 @@ struct Game {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(2);
+    print_challenge_header(2);
     println!("The sum of ids is: {}", solve_part_one(INPUT)?);
     println!("The sum of game powers is: {}", solve_part_two(INPUT)?);
 

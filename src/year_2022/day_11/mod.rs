@@ -4,7 +4,7 @@ use itertools::Itertools;
 use num::{BigUint, Zero};
 use regex::Regex;
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -116,7 +116,7 @@ impl MonkeyConfig {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(11);
+    print_challenge_header(11);
 
     println!(
         "1) The level of monkey business is {}",

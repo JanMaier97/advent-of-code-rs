@@ -1,6 +1,6 @@
 use itertools::Itertools;
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -34,7 +34,7 @@ impl<const N: usize> RingBuffer<N> {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(6);
+    print_challenge_header(6);
 
     println!(
         "1) First packet marker found at index {}",

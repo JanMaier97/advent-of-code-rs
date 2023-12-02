@@ -1,7 +1,7 @@
 use once_cell::sync::OnceCell;
 use regex::Regex;
 
-use crate::{print_challange_header, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -23,7 +23,7 @@ enum LineTypes {
 }
 
 pub fn solve() -> MyResult<()> {
-    print_challange_header(7);
+    print_challenge_header(7);
 
     println!(
         "The total size of directories exeeding the threshold is {}",
