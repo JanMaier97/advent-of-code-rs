@@ -34,29 +34,31 @@ pub fn solve() -> MyResult<()> {
 }
 
 fn solve_part_one(input: &str) -> MyResult<usize> {
-    let mut sum = 0;
-    for line in input.lines() {
-        let digits = find_raw_digits(line);
-        sum += compute_value_of_digits(&digits);
-    }
-
-    Ok(sum)
+    Ok(compute_value(input, find_raw_digits))
 }
 
 fn solve_part_two(input: &str) -> MyResult<usize> {
-    let mut sum = 0;
+    Ok(compute_value(input, find_raw_and_spelled_digits))
+}
 
-    for line in input.lines() {
+fn compute_value<F>(input: &str, digit_finder: F) -> usize 
+where F : Fn(&str) -> Vec<Digit>
+{
+    let sum = input
+        .lines()
+        .map(|l| digit_finder(l))
+        .fold(0, |sum, digit| sum + compute_value_of_digits(&digit));
+
+    sum
+}
+
+fn find_raw_and_spelled_digits(line: &str) -> Vec<Digit> {
         let mut digits = find_raw_digits(line);
-        digits.extend(find_spelled_digits(line));
 
-        let mut digits = digits.into_iter().collect_vec();
+        digits.extend(find_spelled_digits(line));
         digits.sort_by(|a, b| Ord::cmp(&a.index, &b.index));
 
-        sum += compute_value_of_digits(&digits);
-    }
-
-    Ok(sum)
+        digits
 }
 
 fn compute_value_of_digits( digits: &[Digit]) -> usize {
