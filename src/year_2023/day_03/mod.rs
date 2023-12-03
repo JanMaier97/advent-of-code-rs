@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{MyResult, print_challenge_header};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -14,6 +14,46 @@ struct NumberPosition {
     value: u32,
 }
 
+impl NumberPosition {
+    fn get_adjacent_positions(&self) -> Vec<Position> {
+        let mut positions = Vec::new();
+
+        let (start_x, start_y) = self.pos;
+
+        // column before number
+        if start_x > 0 {
+            let prev_x = start_x - 1;
+            positions.push((prev_x, start_y));
+            positions.push((prev_x, start_y + 1));
+            if start_y > 0 {
+                positions.push((prev_x, start_y - 1));
+            }
+        }
+
+        // column after number
+        let post_x = start_x + self.len;
+        positions.push((post_x, start_y));
+        positions.push((post_x, start_y + 1));
+        if start_y > 0 {
+            positions.push((post_x, start_y - 1));
+        }
+
+        for index in 0..self.len {
+            let inner_x = start_x + index;
+            positions.push((inner_x, start_y + 1));
+            if start_y > 0 {
+                positions.push((inner_x, start_y - 1));
+            }
+        }
+        positions
+    }
+
+    fn is_part_number(&self, symbols: &SymbolPositions) -> bool {
+        let adjacent_positions = self.get_adjacent_positions();
+        return adjacent_positions.iter().any(|pos| symbols.contains(pos));
+    }
+}
+
 pub fn solve() -> MyResult<()> {
     print_challenge_header(3);
 
@@ -23,59 +63,20 @@ pub fn solve() -> MyResult<()> {
     Ok(())
 }
 
-
 fn solve_part_one(input: &str) -> u32 {
     let (numbers, symbols) = parse_input(input);
 
-    let mut sum = 0;
-    for number in numbers {
-        let adjacent_positions = get_adjacent_positions(&number);
-        if adjacent_positions.iter().any(|pos| symbols.contains(pos)) {
-            sum += number.value;
-            continue;
-        }
+    let sum = numbers
+        .iter()
+        .filter(|n| n.is_part_number(&symbols))
+        .map(|n| n.value)
+        .sum();
 
-    }
     return sum;
-
 }
 
 fn solve_part_two(input: &str) -> u32 {
     unimplemented!()
-}
-
-fn get_adjacent_positions(number: &NumberPosition) -> Vec<Position> {
-    let mut positions = Vec::new();
-
-    let (start_x, start_y) = number.pos;
-
-    // column before number
-    if start_x > 0 {
-        let prev_x = start_x-1;
-        positions.push((prev_x, start_y));
-        positions.push((prev_x, start_y+1));
-        if start_y > 0 {
-            positions.push((prev_x, start_y-1));
-        }
-    }
-
-    // column after number
-    let post_x = start_x + number.len;
-    positions.push((post_x, start_y));
-    positions.push((post_x, start_y+1));
-    if start_y > 0 {
-        positions.push((post_x, start_y-1));
-    }
-
-    for index in 0..number.len {
-        let inner_x = start_x + index;
-        positions.push((inner_x, start_y + 1));
-        if start_y > 0 {
-            positions.push((inner_x, start_y - 1));
-        }
-    }
-
-    positions
 }
 
 fn parse_input(input: &str) -> (Vec<NumberPosition>, SymbolPositions) {
@@ -93,32 +94,34 @@ fn parse_number_positions(input: &str) -> Vec<NumberPosition> {
 
         let last_char_index = line.len() - 1;
         for (char_index, char) in line.chars().enumerate() {
-           if char.is_numeric() {
+            if char.is_numeric() {
                 adjacent_digits.push(char);
 
                 if current_pos.is_none() {
                     current_pos = Some((char_index, line_number));
                 }
-           } 
+            }
 
-           if current_pos.is_some() && (!char.is_numeric() || char_index == last_char_index) {
+            if current_pos.is_some() && (!char.is_numeric() || char_index == last_char_index) {
                 let number = NumberPosition {
                     pos: current_pos.unwrap(),
                     len: adjacent_digits.len(),
-                    value: adjacent_digits.iter().collect::<String>().parse::<u32>().unwrap(),
+                    value: adjacent_digits
+                        .iter()
+                        .collect::<String>()
+                        .parse::<u32>()
+                        .unwrap(),
                 };
 
                 numbers.push(number);
                 current_pos = None;
                 adjacent_digits.clear();
-           }
-
+            }
         }
     }
 
     numbers
 }
-
 
 fn parse_symbol_positions(input: &str) -> SymbolPositions {
     let mut symbol_positions = HashSet::new();
@@ -139,18 +142,16 @@ fn is_symbol(char: char) -> bool {
         return false;
     }
 
-    if char == '.'  {
+    if char == '.' {
         return false;
     }
-    
+
     true
 }
 
-
-
 #[cfg(test)]
 mod tests {
-    use crate::year_2023::day_03::INPUT;
+    use crate::year_2023::day_03::{solve_part_two, INPUT};
 
     use super::solve_part_one;
 
@@ -166,5 +167,11 @@ mod tests {
     fn part_one_input_solved_correctly() {
         let result = solve_part_one(INPUT);
         assert_eq!(result, 537832)
+    }
+
+    #[test]
+    fn part_two_example_solved_correctly() {
+        let result = solve_part_two(EXAMPLE_INPUT);
+        assert_eq!(result, 467835)
     }
 }
