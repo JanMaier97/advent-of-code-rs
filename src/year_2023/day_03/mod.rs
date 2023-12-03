@@ -1,4 +1,6 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+
+use itertools::Itertools;
 
 use crate::{print_challenge_header, MyResult};
 
@@ -52,13 +54,21 @@ impl NumberPosition {
         let adjacent_positions = self.get_adjacent_positions();
         return adjacent_positions.iter().any(|pos| symbols.contains(pos));
     }
+
+    fn get_positions(&self) -> Vec<Position> {
+        let (pos_x, pos_y) = self.pos;
+
+        let positions = (0..self.len).map(|index| (pos_x + index, pos_y)).collect();
+
+        positions
+    }
 }
 
 pub fn solve() -> MyResult<()> {
     print_challenge_header(3);
 
     println!("The sum of all part numbers is: {}", solve_part_one(INPUT));
-    println!("XXX: {}", solve_part_two(INPUT));
+    println!("The total gear power is: {}", solve_part_two(INPUT));
 
     Ok(())
 }
@@ -76,7 +86,63 @@ fn solve_part_one(input: &str) -> u32 {
 }
 
 fn solve_part_two(input: &str) -> u32 {
-    unimplemented!()
+    let (numbers, symbols) = parse_input(input);
+
+    let part_numbers_positions = numbers
+        .iter()
+        .filter(|n| n.is_part_number(&symbols))
+        .flat_map(|n| n.get_positions().into_iter().map(|pos| (pos, n.value)))
+        .collect::<HashMap<_, _>>();
+
+    let sum = symbols
+        .into_iter()
+        .map(|pos| calculate_gear_value(&pos, &part_numbers_positions))
+        .sum();
+
+    sum
+}
+
+fn calculate_gear_value(symbol_pos: &Position, part_numbers: &HashMap<Position, u32>) -> u32 {
+    let adjacent_positions = get_adjacent_positions(symbol_pos);
+    let mut neighboring_numbers = adjacent_positions
+        .iter()
+        .map(|pos| part_numbers.get(pos).copied())
+        .flatten()
+        .collect_vec();
+
+    // silent bug:
+    // if a symbol has exactly 2 adjacent numbers with the same value
+    // then the symbol is not registered as a gear
+    neighboring_numbers.sort();
+    neighboring_numbers.dedup();
+
+    if neighboring_numbers.len() == 2 {
+        return neighboring_numbers
+            .into_iter()
+            .fold(1, |acc, value| acc * value);
+    }
+
+    return 0;
+}
+
+fn get_adjacent_positions(pos: &Position) -> Vec<Position> {
+    let (center_x, center_y) = *pos;
+    let min_x = center_x.saturating_sub(1);
+    let min_y = center_y.saturating_sub(1);
+    let max_x = center_x + 1;
+    let max_y = center_y + 1;
+
+    let mut positions = Vec::new();
+    for x in min_x..=max_x {
+        for y in min_y..=max_y {
+            if x == center_x && y == center_y {
+                continue;
+            }
+            positions.push((x, y));
+        }
+    }
+
+    positions
 }
 
 fn parse_input(input: &str) -> (Vec<NumberPosition>, SymbolPositions) {
@@ -173,5 +239,11 @@ mod tests {
     fn part_two_example_solved_correctly() {
         let result = solve_part_two(EXAMPLE_INPUT);
         assert_eq!(result, 467835)
+    }
+
+    #[test]
+    fn part_two_input_solved_correctly() {
+        let result = solve_part_two(INPUT);
+        assert_eq!(result, 81939900)
     }
 }
