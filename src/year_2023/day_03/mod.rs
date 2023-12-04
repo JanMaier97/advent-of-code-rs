@@ -127,7 +127,7 @@ fn calculate_gear_value(symbol_pos: &Position, part_numbers: &HashMap<Position, 
 
 fn get_adjacent_positions(pos: &Position) -> Vec<Position> {
     let (center_x, center_y) = *pos;
-    let min_x = center_x.saturating_sub(1);
+    let min_x: usize = center_x.saturating_sub(1);
     let min_y = center_y.saturating_sub(1);
     let max_x = center_x + 1;
     let max_y = center_y + 1;
