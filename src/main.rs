@@ -6,7 +6,7 @@ mod year_2023;
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
 fn main() -> MyResult<()> {
-    year_2022::run()?;
+    // year_2022::run()?;
     year_2023::run()?;
 
     Ok(())
