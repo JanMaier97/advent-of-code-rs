@@ -20,18 +20,28 @@ pub fn solve() -> MyResult<()> {
     print_challenge_header(5);
 
     println!("The lowest location number is: {}", solve_part_one(INPUT));
-    println!("XXX: {}", solve_part_two(INPUT));
+    println!("The actual lowest location number is: {}", solve_part_two(INPUT));
 
     Ok(())
 }
 
+fn solve_part_two(input:&str) -> u64 {
+    let puzzle = parse_input(input);
+    !unimplemented!()
+}
+
 fn solve_part_one(input: &str) -> u64 {
     let puzzle_input = parse_input(input);
+    determine_lowest_location(&puzzle_input.seeds, &puzzle_input.mappings)
+}
+
+fn determine_lowest_location(seeds: &[u64], mappings: &[Vec<MappingRange>])-> u64 {
+
     let mut soil_numbers = Vec::new();
 
-    for seed in puzzle_input.seeds.iter().copied() {
+    for seed in seeds.iter().copied() {
         let mut source = seed;
-        for mapping in puzzle_input.mappings.iter() {
+        for mapping in mappings {
             source = get_mapped_destination(source, mapping);
         }
 
@@ -53,10 +63,6 @@ fn get_mapped_destination(source: u64, mapping: &[MappingRange]) -> u64 {
     source
 }
 
-fn solve_part_two(input:&str) -> u64 {
-
-    !unimplemented!()
-}
 
 
 fn parse_input(input: &str) -> PuzzleInput {
@@ -116,7 +122,7 @@ fn parse_mapping_paragraph(paragraph: &str) -> Vec<MappingRange> {
 
 #[cfg(test)]
 mod tests {
-    use crate::year_2023::day_05::INPUT;
+    use crate::year_2023::day_05::{INPUT, solve_part_two};
 
     use super::solve_part_one;
 
@@ -133,4 +139,11 @@ mod tests {
         let result = solve_part_one(INPUT);
         assert_eq!(result, 309796150);
     }
+
+    #[test]
+    fn part_two_example_input_solved_correctly() {
+        let result = solve_part_two(EXAMPLE_INPUT);
+        assert_eq!(result, 46);
+    }
+
 }
