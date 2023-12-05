@@ -1,4 +1,4 @@
-use itertools::Itertools;
+use std::collections::HashMap;
 
 use crate::{print_challenge_header, MyResult};
 
@@ -12,11 +12,7 @@ struct Cards {
 
 impl Cards {
     fn points(&self) -> u32 {
-        let numbers = self
-            .numbers
-            .iter()
-            .filter(|n| self.winning_numbers.contains(n))
-            .collect_vec();
+        let numbers = self.get_matching_numbers();
 
         if numbers.len() == 0 {
             return 0;
@@ -24,13 +20,21 @@ impl Cards {
 
         numbers.iter().skip(1).fold(1, |sum, _| sum * 2)
     }
+
+    fn get_matching_numbers(&self) -> Vec<u32> {
+        self.numbers
+            .iter()
+            .copied()
+            .filter(|n| self.winning_numbers.contains(n))
+            .collect::<Vec<_>>()
+    }
 }
 
 pub fn solve() -> MyResult<()> {
     print_challenge_header(4);
 
     println!("{}", solve_part_one(INPUT));
-    println!("{}", solve_part_one(INPUT));
+    println!("{}", solve_part_two(INPUT));
     Ok(())
 }
 
@@ -43,7 +47,27 @@ fn solve_part_one(input: &str) -> u32 {
 }
 
 fn solve_part_two(input: &str) -> u32 {
-    unimplemented!()
+    let cards = parse_input(input);
+    let mut card_count_mapping = cards
+        .iter()
+        .map(|c| (c.id, 1_u32))
+        .collect::<HashMap<_, _>>();
+
+    for card in cards {
+        let ids_to_duplicate = card
+            .get_matching_numbers()
+            .into_iter()
+            .enumerate()
+            .map(|(index, _)| card.id + index + 1);
+
+        for id in ids_to_duplicate {
+            let count = *card_count_mapping.get(&id).unwrap();
+            let current_card_count = *card_count_mapping.get(&card.id).unwrap();
+            card_count_mapping.insert(id, count + current_card_count);
+        }
+    }
+
+    card_count_mapping.into_iter().map(|(_, count)| count).sum()
 }
 
 fn parse_input(input: &str) -> Vec<Cards> {
@@ -85,21 +109,33 @@ fn parse_number_list(number: &str) -> Vec<u32> {
 
 #[cfg(test)]
 mod tests {
-    use crate::year_2023::day_04::INPUT;
+    use crate::year_2023::day_04::{solve_part_two, INPUT};
 
     use super::solve_part_one;
 
     const EXAMPLE_INPUT: &str = include_str!("example.txt");
 
     #[test]
-    fn example_input_solved_correctly() {
+    fn example_input_part_one_solved_correctly() {
         let result = solve_part_one(EXAMPLE_INPUT);
         assert_eq!(result, 13);
     }
 
     #[test]
-    fn real_input_solved_correctly() {
+    fn real_input_part_one_solved_correctly() {
         let result = solve_part_one(INPUT);
         assert_eq!(result, 20829);
+    }
+
+    #[test]
+    fn example_input_part_two_solved_correctly() {
+        let result = solve_part_two(EXAMPLE_INPUT);
+        assert_eq!(result, 30);
+    }
+
+    #[test]
+    fn real_input_part_two_solved_correctly() {
+        let result = solve_part_two(INPUT);
+        assert_eq!(result, 12648035);
     }
 }
