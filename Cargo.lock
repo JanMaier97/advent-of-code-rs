@@ -10,6 +10,7 @@ dependencies = [
  "itertools 0.12.0",
  "num",
  "once_cell",
+ "rayon",
  "regex",
 ]
 

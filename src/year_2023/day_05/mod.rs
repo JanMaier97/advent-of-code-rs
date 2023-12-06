@@ -1,6 +1,7 @@
 use std::{collections::HashSet, iter::Filter, ops::Index};
 
 use itertools::Itertools;
+use rayon::prelude::*;
 
 use crate::{MyResult, print_challenge_header};
 
@@ -49,9 +50,9 @@ pub fn solve_part_two(input:&str) -> u64 {
 
     let mut lowest_location = u64::MAX;
     for (start_seed, length) in seeds.into_iter().zip(lengths) {
-        let seed_range = (start_seed..(start_seed+length));
+        let seed_range = (start_seed..(start_seed+length)).into_iter().collect_vec();
 
-        let location = determine_lowest_location(seed_range, &puzzle.mappings);
+        let location = determine_lowest_location(&seed_range, &puzzle.mappings);
 
         if location < lowest_location {
             lowest_location = location;
@@ -65,25 +66,21 @@ pub fn solve_part_two(input:&str) -> u64 {
 
 fn solve_part_one(input: &str) -> u64 {
     let puzzle_input = parse_input(input);
-    determine_lowest_location(puzzle_input.seeds, &puzzle_input.mappings)
+    determine_lowest_location(&puzzle_input.seeds, &puzzle_input.mappings)
 }
 
-fn determine_lowest_location(seeds: impl IntoIterator<Item = u64>, mappings: &[Vec<MappingRange>])-> u64 {
+fn determine_lowest_location(seeds: &[u64], mappings: &[Vec<MappingRange>])-> u64 {
+    let lowest_location = seeds.par_iter()
+        .map(|seed| {
+            let mut source = *seed;
+            for mapping in mappings {
+                source = get_mapped_destination(source, mapping);
+            }
+            source
+        })
+        .min();
 
-    let mut lowest_location  = u64::MAX;
-
-    for seed in seeds {
-        let mut source = seed;
-        for mapping in mappings {
-            source = get_mapped_destination(source, mapping);
-        }
-
-        if source < lowest_location {
-            lowest_location = source;
-        }
-    }
-
-    lowest_location
+    lowest_location.unwrap()
 }
 
 fn get_mapped_destination(source: u64, mapping: &[MappingRange]) -> u64 {
