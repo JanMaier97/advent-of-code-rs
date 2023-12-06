@@ -1,9 +1,9 @@
-use std::{collections::HashSet, iter::Filter, ops::Index};
+use std::ops::Index;
 
 use itertools::Itertools;
 use rayon::prelude::*;
 
-use crate::{MyResult, print_challenge_header};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -16,24 +16,28 @@ struct MappingRange {
 
 struct PuzzleInput {
     seeds: Vec<u64>,
-    mappings: Vec<Vec<MappingRange>>
+    mappings: Vec<Vec<MappingRange>>,
 }
 
 pub fn solve() -> MyResult<()> {
     print_challenge_header(5);
 
     println!("The lowest location number is: {}", solve_part_one(INPUT));
-    println!("The actual lowest location number is: {}", solve_part_two(INPUT));
+    println!(
+        "The actual lowest location number is: {}",
+        solve_part_two(INPUT)
+    );
 
     Ok(())
 }
 
-pub fn solve_part_two(input:&str) -> u64 {
+pub fn solve_part_two(input: &str) -> u64 {
     let puzzle = parse_input(input);
 
     assert!(puzzle.seeds.len() % 2 == 0);
 
-    let seeds = puzzle.seeds
+    let seeds = puzzle
+        .seeds
         .iter()
         .copied()
         .enumerate()
@@ -41,7 +45,8 @@ pub fn solve_part_two(input:&str) -> u64 {
         .map(|(_, value)| value)
         .collect_vec();
 
-    let lengths = puzzle.seeds
+    let lengths = puzzle
+        .seeds
         .into_iter()
         .enumerate()
         .filter(|(index, _)| index % 2 == 1)
@@ -50,18 +55,18 @@ pub fn solve_part_two(input:&str) -> u64 {
 
     let mut lowest_location = u64::MAX;
     for (start_seed, length) in seeds.into_iter().zip(lengths) {
-        let seed_range = (start_seed..(start_seed+length)).into_iter().collect_vec();
+        let seed_range = (start_seed..(start_seed + length))
+            .into_iter()
+            .collect_vec();
 
         let location = determine_lowest_location(&seed_range, &puzzle.mappings);
 
         if location < lowest_location {
             lowest_location = location;
         }
-        
     }
 
     lowest_location
-
 }
 
 fn solve_part_one(input: &str) -> u64 {
@@ -69,8 +74,9 @@ fn solve_part_one(input: &str) -> u64 {
     determine_lowest_location(&puzzle_input.seeds, &puzzle_input.mappings)
 }
 
-fn determine_lowest_location(seeds: &[u64], mappings: &[Vec<MappingRange>])-> u64 {
-    let lowest_location = seeds.par_iter()
+fn determine_lowest_location(seeds: &[u64], mappings: &[Vec<MappingRange>]) -> u64 {
+    let lowest_location = seeds
+        .par_iter()
         .map(|seed| {
             let mut source = *seed;
             for mapping in mappings {
@@ -91,21 +97,25 @@ fn get_mapped_destination(source: u64, mapping: &[MappingRange]) -> u64 {
     source
 }
 
-
 fn find_mapping_range(source: u64, mapping: &[MappingRange]) -> Option<&MappingRange> {
-    binary_search(mapping, source, 0, mapping.len()-1)
+    binary_search(mapping, source, 0, mapping.len() - 1)
 }
 
-fn binary_search(list: &[MappingRange], target: u64, start_index: usize, end_index: usize) -> Option<&MappingRange> {
-
+fn binary_search(
+    list: &[MappingRange],
+    target: u64,
+    start_index: usize,
+    end_index: usize,
+) -> Option<&MappingRange> {
     if start_index > end_index {
         return None;
     }
 
-    let middle_index = (start_index + end_index)  / 2;
+    let middle_index = (start_index + end_index) / 2;
     let current_mapping = list.index(middle_index);
 
-    if target >= current_mapping.start && target < (current_mapping.start + current_mapping.length) {
+    if target >= current_mapping.start && target < (current_mapping.start + current_mapping.length)
+    {
         return Some(current_mapping);
     }
 
@@ -114,36 +124,35 @@ fn binary_search(list: &[MappingRange], target: u64, start_index: usize, end_ind
             return None;
         }
 
-        return binary_search(list, target, middle_index+1, end_index);
-    } 
-        
+        return binary_search(list, target, middle_index + 1, end_index);
+    }
+
     if middle_index == 0 {
         return None;
     }
-    return binary_search(list, target, start_index, middle_index-1);
+    return binary_search(list, target, start_index, middle_index - 1);
 }
 
 fn parse_input(input: &str) -> PuzzleInput {
-    PuzzleInput { 
+    PuzzleInput {
         seeds: parse_seeds(input),
-         mappings: parse_mappings(input)
-        }
+        mappings: parse_mappings(input),
+    }
 }
 
-fn parse_seeds(input: &str)-> Vec<u64> {
+fn parse_seeds(input: &str) -> Vec<u64> {
     let seeds = input
         .lines()
         .into_iter()
         .take(1)
-        .map(|line| 
-            line
-                .split(' ')
+        .map(|line| {
+            line.split(' ')
                 .skip(1)
                 .map(|str| str.parse::<u64>().unwrap())
-            )
+        })
         .flatten()
         .collect::<Vec<_>>();
-        
+
     seeds
 }
 
@@ -159,19 +168,21 @@ fn parse_mappings(input: &str) -> Vec<Vec<MappingRange>> {
     mappings
 }
 
-
 fn parse_mapping_paragraph(paragraph: &str) -> Vec<MappingRange> {
     let mut ranges = paragraph
         .lines()
         .skip(1)
-        .map(|line|
-            line
-                .split(" ")
+        .map(|line| {
+            line.split(" ")
                 .map(|s| s.parse::<u64>().unwrap())
                 .collect_vec()
-        )
-        .inspect(|numbers| assert_eq!(numbers.len(), 3) )
-        .map(|numbers| MappingRange { destination: numbers[0], start: numbers[1], length: numbers[2] })
+        })
+        .inspect(|numbers| assert_eq!(numbers.len(), 3))
+        .map(|numbers| MappingRange {
+            destination: numbers[0],
+            start: numbers[1],
+            length: numbers[2],
+        })
         .collect::<Vec<_>>();
 
     ranges.sort_by(|a, b| a.start.cmp(&b.start));
@@ -179,12 +190,11 @@ fn parse_mapping_paragraph(paragraph: &str) -> Vec<MappingRange> {
     ranges
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::year_2023::day_05::{INPUT, solve_part_two};
+    use crate::year_2023::day_05::{solve_part_two, INPUT};
 
-    use super::{solve_part_one, MappingRange, find_mapping_range};
+    use super::{find_mapping_range, solve_part_one, MappingRange};
 
     const EXAMPLE_INPUT: &str = include_str!("example.txt");
 
@@ -215,9 +225,21 @@ mod tests {
     #[test]
     fn binary_search_finds_middle() {
         let mappings = vec![
-            MappingRange { start: 10, destination: 0, length: 1 },
-            MappingRange { start: 20, destination: 0, length: 1 },
-            MappingRange { start: 30, destination: 0, length: 1 },
+            MappingRange {
+                start: 10,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 20,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 30,
+                destination: 0,
+                length: 1,
+            },
         ];
 
         let res = find_mapping_range(20, &mappings);
@@ -228,9 +250,21 @@ mod tests {
     #[test]
     fn binary_search_finds_start() {
         let mappings = vec![
-            MappingRange { start: 10, destination: 0, length: 1 },
-            MappingRange { start: 20, destination: 0, length: 1 },
-            MappingRange { start: 30, destination: 0, length: 1 },
+            MappingRange {
+                start: 10,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 20,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 30,
+                destination: 0,
+                length: 1,
+            },
         ];
 
         let res = find_mapping_range(10, &mappings);
@@ -241,9 +275,21 @@ mod tests {
     #[test]
     fn binary_search_finds_end() {
         let mappings = vec![
-            MappingRange { start: 10, destination: 0, length: 1 },
-            MappingRange { start: 20, destination: 0, length: 1 },
-            MappingRange { start: 30, destination: 0, length: 1 },
+            MappingRange {
+                start: 10,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 20,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 30,
+                destination: 0,
+                length: 1,
+            },
         ];
 
         let res = find_mapping_range(30, &mappings);
@@ -254,11 +300,31 @@ mod tests {
     #[test]
     fn binary_search_finds_lower_middle() {
         let mappings = vec![
-            MappingRange { start: 10, destination: 0, length: 1 },
-            MappingRange { start: 20, destination: 0, length: 1 },
-            MappingRange { start: 30, destination: 0, length: 1 },
-            MappingRange { start: 40, destination: 0, length: 1 },
-            MappingRange { start: 50, destination: 0, length: 1 },
+            MappingRange {
+                start: 10,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 20,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 30,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 40,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 50,
+                destination: 0,
+                length: 1,
+            },
         ];
 
         let res = find_mapping_range(20, &mappings);
@@ -269,11 +335,31 @@ mod tests {
     #[test]
     fn binary_search_finds_upper_middle() {
         let mappings = vec![
-            MappingRange { start: 10, destination: 0, length: 1 },
-            MappingRange { start: 20, destination: 0, length: 1 },
-            MappingRange { start: 30, destination: 0, length: 1 },
-            MappingRange { start: 40, destination: 0, length: 1 },
-            MappingRange { start: 50, destination: 0, length: 1 },
+            MappingRange {
+                start: 10,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 20,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 30,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 40,
+                destination: 0,
+                length: 1,
+            },
+            MappingRange {
+                start: 50,
+                destination: 0,
+                length: 1,
+            },
         ];
 
         let res = find_mapping_range(40, &mappings);
@@ -284,11 +370,31 @@ mod tests {
     #[test]
     fn binary_search_finds_none_high_value() {
         let mappings = vec![
-            MappingRange { start: 10, destination: 0, length: 0 },
-            MappingRange { start: 20, destination: 0, length: 0 },
-            MappingRange { start: 30, destination: 0, length: 0 },
-            MappingRange { start: 40, destination: 0, length: 0 },
-            MappingRange { start: 50, destination: 0, length: 0 },
+            MappingRange {
+                start: 10,
+                destination: 0,
+                length: 0,
+            },
+            MappingRange {
+                start: 20,
+                destination: 0,
+                length: 0,
+            },
+            MappingRange {
+                start: 30,
+                destination: 0,
+                length: 0,
+            },
+            MappingRange {
+                start: 40,
+                destination: 0,
+                length: 0,
+            },
+            MappingRange {
+                start: 50,
+                destination: 0,
+                length: 0,
+            },
         ];
 
         let res = find_mapping_range(60, &mappings);
@@ -298,15 +404,34 @@ mod tests {
     #[test]
     fn binary_search_finds_none_low() {
         let mappings = vec![
-            MappingRange { start: 10, destination: 0, length: 0 },
-            MappingRange { start: 20, destination: 0, length: 0 },
-            MappingRange { start: 30, destination: 0, length: 0 },
-            MappingRange { start: 40, destination: 0, length: 0 },
-            MappingRange { start: 50, destination: 0, length: 0 },
+            MappingRange {
+                start: 10,
+                destination: 0,
+                length: 0,
+            },
+            MappingRange {
+                start: 20,
+                destination: 0,
+                length: 0,
+            },
+            MappingRange {
+                start: 30,
+                destination: 0,
+                length: 0,
+            },
+            MappingRange {
+                start: 40,
+                destination: 0,
+                length: 0,
+            },
+            MappingRange {
+                start: 50,
+                destination: 0,
+                length: 0,
+            },
         ];
 
         let res = find_mapping_range(0, &mappings);
         assert!(res.is_none());
     }
-
 }
