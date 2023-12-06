@@ -1,3 +1,5 @@
+use std::{collections::HashSet, iter::Filter};
+
 use itertools::Itertools;
 
 use crate::{MyResult, print_challenge_header};
@@ -25,9 +27,44 @@ pub fn solve() -> MyResult<()> {
     Ok(())
 }
 
-fn solve_part_two(input:&str) -> u64 {
+pub fn solve_part_two(input:&str) -> u64 {
     let puzzle = parse_input(input);
-    !unimplemented!()
+
+    assert!(puzzle.seeds.len() % 2 == 0);
+
+    let seeds = puzzle.seeds
+        .iter()
+        .copied()
+        .enumerate()
+        .filter(|(index, _)| index % 2 == 0)
+        .map(|(_, value)| value)
+        .collect_vec();
+
+    let lengths = puzzle.seeds
+        .into_iter()
+        .enumerate()
+        .filter(|(index, _)| index % 2 == 1)
+        .map(|(_, value)| value)
+        .collect_vec();
+
+    let mut lowest_location = u64::MAX;
+    let mut solved_seeds=HashSet::new();
+    for (start_seed, length) in seeds.into_iter().zip(lengths) {
+        let seed_range = (start_seed..(start_seed+length))
+            .into_iter().filter(|s| !solved_seeds.contains(s))
+            .collect_vec(); 
+
+        let location = determine_lowest_location(&seed_range, &puzzle.mappings);
+        solved_seeds.extend(seed_range);
+
+        if location < lowest_location {
+            lowest_location = location;
+        }
+        
+    }
+
+    lowest_location
+
 }
 
 fn solve_part_one(input: &str) -> u64 {
@@ -37,7 +74,7 @@ fn solve_part_one(input: &str) -> u64 {
 
 fn determine_lowest_location(seeds: &[u64], mappings: &[Vec<MappingRange>])-> u64 {
 
-    let mut soil_numbers = Vec::new();
+    let mut lowest_location  = u64::MAX;
 
     for seed in seeds.iter().copied() {
         let mut source = seed;
@@ -45,10 +82,12 @@ fn determine_lowest_location(seeds: &[u64], mappings: &[Vec<MappingRange>])-> u6
             source = get_mapped_destination(source, mapping);
         }
 
-        soil_numbers.push(source)
+        if source < lowest_location {
+            lowest_location = source;
+        }
     }
 
-    soil_numbers.into_iter().min().unwrap()
+    lowest_location
 }
 
 fn get_mapped_destination(source: u64, mapping: &[MappingRange]) -> u64 {
@@ -62,8 +101,6 @@ fn get_mapped_destination(source: u64, mapping: &[MappingRange]) -> u64 {
 
     source
 }
-
-
 
 fn parse_input(input: &str) -> PuzzleInput {
     PuzzleInput { 
