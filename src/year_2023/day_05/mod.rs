@@ -48,14 +48,10 @@ pub fn solve_part_two(input:&str) -> u64 {
         .collect_vec();
 
     let mut lowest_location = u64::MAX;
-    let mut solved_seeds=HashSet::new();
     for (start_seed, length) in seeds.into_iter().zip(lengths) {
-        let seed_range = (start_seed..(start_seed+length))
-            .into_iter().filter(|s| !solved_seeds.contains(s))
-            .collect_vec(); 
+        let seed_range = (start_seed..(start_seed+length));
 
-        let location = determine_lowest_location(&seed_range, &puzzle.mappings);
-        solved_seeds.extend(seed_range);
+        let location = determine_lowest_location(seed_range, &puzzle.mappings);
 
         if location < lowest_location {
             lowest_location = location;
@@ -69,14 +65,14 @@ pub fn solve_part_two(input:&str) -> u64 {
 
 fn solve_part_one(input: &str) -> u64 {
     let puzzle_input = parse_input(input);
-    determine_lowest_location(&puzzle_input.seeds, &puzzle_input.mappings)
+    determine_lowest_location(puzzle_input.seeds, &puzzle_input.mappings)
 }
 
-fn determine_lowest_location(seeds: &[u64], mappings: &[Vec<MappingRange>])-> u64 {
+fn determine_lowest_location(seeds: impl IntoIterator<Item = u64>, mappings: &[Vec<MappingRange>])-> u64 {
 
     let mut lowest_location  = u64::MAX;
 
-    for seed in seeds.iter().copied() {
+    for seed in seeds {
         let mut source = seed;
         for mapping in mappings {
             source = get_mapped_destination(source, mapping);
@@ -92,10 +88,8 @@ fn determine_lowest_location(seeds: &[u64], mappings: &[Vec<MappingRange>])-> u6
 
 fn get_mapped_destination(source: u64, mapping: &[MappingRange]) -> u64 {
     if let Some(map) = find_mapping_range(source, mapping) {
-        if source >= map.start && source < (map.start + map.length) {
-            let offset = source - map.start;
-            return map.destination + offset;
-        } 
+        let offset = source - map.start;
+        return map.destination + offset;
     };
     source
 }
@@ -213,6 +207,12 @@ mod tests {
     fn part_two_example_input_solved_correctly() {
         let result = solve_part_two(EXAMPLE_INPUT);
         assert_eq!(result, 46);
+    }
+
+    #[test]
+    fn part_two_real_input_solved_correctly() {
+        let result = solve_part_two(INPUT);
+        assert_eq!(result, 50716416);
     }
 
     #[test]
