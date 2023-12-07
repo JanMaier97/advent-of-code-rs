@@ -7,8 +7,8 @@ const INPUT: &str = include_str!("input.txt");
 
 #[derive(Debug)]
 struct Race {
-    time: u32,
-    distance: u32,
+    time: u64,
+    distance: u64,
 }
 
 pub fn solve() -> MyResult<()> {
@@ -19,10 +19,15 @@ pub fn solve() -> MyResult<()> {
         solve_part_one(INPUT)
     );
 
+    println!(
+        "The product of win possibilities for the actual race is {}",
+        solve_part_two(INPUT)
+    );
+
     Ok(())
 }
 
-fn solve_part_one(input: &str) -> u32 {
+fn solve_part_one(input: &str) -> u64 {
     let races = parse_input(input);
 
     let res = races
@@ -34,13 +39,35 @@ fn solve_part_one(input: &str) -> u32 {
     res
 }
 
-fn solve_part_two(input: &str) -> u32 {
-    unimplemented!()
+fn solve_part_two(input: &str) -> u64 {
+    let race = parse_input_as_single_race(input);
+    println!("time: {}, distance: {}", race.time, race.distance);
+
+    let (min, max) = compute_min_and_max_button_duration(&race);
+
+    println!("min: {}, max: {}", min, max);
+
+    max - min + 1
 }
 
-fn compute_min_and_max_button_duration(race: &Race) -> (u32, u32) {
-    let time = race.time as f32;
-    let distance = race.distance as f32;
+fn parse_input_as_single_race(input: &str) -> Race {
+    let x = input
+        .lines()
+        .into_iter()
+        .map(|l| l.split(' ').skip(1).join("").parse::<u64>().unwrap())
+        .collect_vec();
+
+    assert_eq!(x.len(), 2);
+
+    Race {
+        time: x[0],
+        distance: x[1],
+    }
+}
+
+fn compute_min_and_max_button_duration(race: &Race) -> (u64, u64) {
+    let time = race.time as f64;
+    let distance = race.distance as f64;
 
     let offset = (((time * time) / 4.) - distance).sqrt();
     let prefix = time / 2.;
@@ -48,7 +75,7 @@ fn compute_min_and_max_button_duration(race: &Race) -> (u32, u32) {
     let min = prefix - offset + 1.;
     let max = prefix + offset - 1.;
 
-    (min.floor() as u32, max.ceil() as u32)
+    (min.floor() as u64, max.ceil() as u64)
 }
 
 fn parse_input(input: &str) -> Vec<Race> {
@@ -59,7 +86,7 @@ fn parse_input(input: &str) -> Vec<Race> {
             l.split(' ')
                 .skip(1)
                 .filter(|s| !s.is_empty())
-                .map(|s| s.parse::<u32>())
+                .map(|s| s.parse::<u64>())
                 .flatten()
                 .collect_vec()
         })
@@ -75,7 +102,7 @@ fn parse_input(input: &str) -> Vec<Race> {
 
 #[cfg(test)]
 mod tests {
-    use crate::year_2023::day_06::INPUT;
+    use crate::year_2023::day_06::{solve_part_two, INPUT};
 
     use super::solve_part_one;
 
@@ -91,5 +118,17 @@ mod tests {
     fn real_input_part_one_solved_correctly() {
         let result = solve_part_one(INPUT);
         assert_eq!(result, 1413720);
+    }
+
+    #[test]
+    fn example_input_part_two_solved_correctly() {
+        let result = solve_part_two(EXAMPLE_INPUT);
+        assert_eq!(result, 71503);
+    }
+
+    #[test]
+    fn real_input_part_two_solved_correctly() {
+        let result = solve_part_two(INPUT);
+        assert_eq!(result, 30565288);
     }
 }
