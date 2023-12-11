@@ -1,7 +1,6 @@
 use itertools::Itertools;
-use num::{integer::Roots, Float};
 
-use crate::{print_challenge_header, run, MyResult};
+use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 

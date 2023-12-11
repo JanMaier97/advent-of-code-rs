@@ -1,8 +1,6 @@
-use std::collections::HashSet;
-
 use itertools::Itertools;
 
-use super::{get_hand_type, get_max_duplicate_count, HandRule, HandType};
+use super::{get_hand_type, HandRule, HandType};
 
 #[derive(PartialEq, PartialOrd, Debug, Clone)]
 pub struct NoJokerRule {
