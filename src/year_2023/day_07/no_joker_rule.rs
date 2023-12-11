@@ -2,8 +2,7 @@ use std::collections::HashSet;
 
 use itertools::Itertools;
 
-use super::{HandType, get_max_duplicate_count, HandRule};
-
+use super::{get_hand_type, get_max_duplicate_count, HandRule, HandType};
 
 #[derive(PartialEq, PartialOrd, Debug, Clone)]
 pub struct NoJokerRule {
@@ -12,10 +11,10 @@ pub struct NoJokerRule {
 }
 
 impl HandRule for NoJokerRule {
-    fn from_cards(cards: &str)-> Self {
+    fn from_cards(cards: &str) -> Self {
         let cards = NoJokerRule::parse_cards(cards);
         Self {
-            r#type: NoJokerRule::get_type(&cards),
+            r#type: get_hand_type(&cards),
             cards: cards,
         }
     }
@@ -42,22 +41,5 @@ impl NoJokerRule {
                 c => c.to_digit(10).unwrap(),
             })
             .collect_vec()
-    }
-
-    fn get_type(cards: &[u32]) -> HandType {
-        let unique_values = cards.iter().collect::<HashSet<_>>().len();
-
-        let max_duplicate_count = get_max_duplicate_count(cards);
-
-        match unique_values {
-            5 => HandType::HighCard,
-            4 => HandType::OnePair,
-            3 if max_duplicate_count == 2 => HandType::TwoPair,
-            3 => HandType::Triple,
-            2 if max_duplicate_count == 4 => HandType::Four,
-            2 => HandType::FullHouse,
-            1 => HandType::Five,
-            _ => panic!(),
-        }
     }
 }

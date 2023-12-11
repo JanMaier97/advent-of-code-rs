@@ -1,12 +1,13 @@
-use std::{collections::HashSet, clone};
+use std::collections::HashSet;
 
 use itertools::Itertools;
 
 use crate::{print_challenge_header, MyResult};
 
-use self::no_joker_hand::NoJokerRule;
+use self::{joker_rule::JokerRule, no_joker_rule::NoJokerRule};
 
-mod no_joker_hand;
+mod joker_rule;
+mod no_joker_rule;
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -21,18 +22,41 @@ enum HandType {
     HighCard = 1,
 }
 
+fn get_hand_type(cards: &[u32]) -> HandType {
+    let unique_values = cards.iter().collect::<HashSet<_>>().len();
+
+    let max_duplicate_count = get_max_duplicate_count(cards);
+
+    match unique_values {
+        5 => HandType::HighCard,
+        4 => HandType::OnePair,
+        3 if max_duplicate_count == 2 => HandType::TwoPair,
+        3 => HandType::Triple,
+        2 if max_duplicate_count == 4 => HandType::Four,
+        2 => HandType::FullHouse,
+        1 => HandType::Five,
+        _ => panic!(),
+    }
+}
 
 fn get_max_duplicate_count(cards: &[u32]) -> usize {
     cards
         .into_iter()
         .unique()
-        .map(|c| cards.iter().filter(|&c2| c2 == c).collect_vec().len())
+        .map(|c| count_element(c, cards))
         .max()
         .unwrap()
 }
 
+fn count_element(element: &u32, cards: &[u32]) -> usize {
+    cards.iter().filter(|&c| element == c).collect_vec().len()
+}
+
 #[derive(Debug)]
-struct Bid<THand> where THand : HandRule {
+struct Bid<THand>
+where
+    THand: HandRule,
+{
     hand: THand,
     bid: u32,
 }
@@ -69,7 +93,14 @@ fn solve_part_one(input: &str) -> u32 {
 }
 
 fn solve_part_two(input: &str) -> u32 {
-    !unimplemented!()
+    let mut bids = parse_input::<JokerRule>(input);
+
+    bids.sort_unstable_by(|a, b| a.hand.partial_cmp(&b.hand).unwrap());
+
+    bids.iter()
+        .enumerate()
+        .map(|(index, bid)| ((index + 1) as u32) * bid.bid)
+        .sum()
 }
 
 fn parse_input<THand: HandRule>(input: &str) -> Vec<Bid<THand>> {
@@ -101,11 +132,16 @@ mod tests {
         let result = solve_part_two(EXAMPLE_INPUT);
         assert_eq!(result, 5905);
     }
+
+    #[test]
+    fn part_two_real_input_correct() {
+        let result = solve_part_two(INPUT);
+        assert_eq!(result, 250757288);
+    }
 }
 
-
 trait HandRule {
-    fn from_cards(cards: &str)-> Self;
-    fn r#type(&self) -> HandType; 
-    fn cards(&self) -> Vec<u32>; 
+    fn from_cards(cards: &str) -> Self;
+    fn r#type(&self) -> HandType;
+    fn cards(&self) -> Vec<u32>;
 }
