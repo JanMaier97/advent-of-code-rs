@@ -10,15 +10,22 @@ pub fn solve() -> MyResult<()> {
         "The sum of extrapolated values is {}",
         solve_part_one(INPUT)
     );
+    println!(
+        "The sum of inverted extrapolated values is {}",
+        solve_part_two(INPUT)
+    );
 
     Ok(())
 }
 
 fn solve_part_one(input: &str) -> i32 {
     let histories = parse_input(input);
+    extrapolate_and_sum(&histories)
+}
 
+fn extrapolate_and_sum(histories: &[Vec<i32>]) -> i32 {
     let mut total_sum = 0;
-    for history in histories.iter() {
+    for history in histories {
         let mut extrapolated_sum = 0;
         let interpolated_values = interpolate(history);
 
@@ -33,7 +40,14 @@ fn solve_part_one(input: &str) -> i32 {
 }
 
 fn solve_part_two(input: &str) -> i32 {
-    unimplemented!()
+    let histories = parse_input(input);
+
+    let inverted_histories = histories
+        .into_iter()
+        .map(|h| h.into_iter().rev().collect_vec())
+        .collect_vec();
+
+    extrapolate_and_sum(&inverted_histories)
 }
 
 fn parse_input(input: &str) -> Vec<Vec<i32>> {
@@ -82,7 +96,7 @@ fn interpolate(history: &[i32]) -> Vec<i32> {
 
 #[cfg(test)]
 mod tests {
-    use crate::year_2023::day_09::INPUT;
+    use crate::year_2023::day_09::{solve_part_two, INPUT};
 
     use super::solve_part_one;
 
@@ -98,5 +112,17 @@ mod tests {
     fn solve_real_part_one_correctly() {
         let result = solve_part_one(INPUT);
         assert_eq!(result, 1916822650);
+    }
+
+    #[test]
+    fn solve_example_part_two_correctly() {
+        let result = solve_part_two(EXAMPLE_INPUT);
+        assert_eq!(result, 2);
+    }
+
+    #[test]
+    fn solve_real_part_two_correctly() {
+        let result = solve_part_two(INPUT);
+        assert_eq!(result, 966);
     }
 }
