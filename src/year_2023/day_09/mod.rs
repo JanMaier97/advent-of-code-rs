@@ -79,11 +79,6 @@ fn interpolate(history: &[i32]) -> Vec<i32> {
         previous_history = &interpolated_histories.last().unwrap();
     }
 
-    println!("{}", history.iter().map(|v| v.to_string()).join(" "));
-    interpolated_histories
-        .iter()
-        .for_each(|h| println!("{}", h.iter().map(|v| v.to_string()).join(" ")));
-
     let last_interpolated_values = interpolated_histories
         .iter()
         .map(|history| *history.last().unwrap());
