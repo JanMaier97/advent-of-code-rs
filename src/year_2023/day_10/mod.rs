@@ -26,12 +26,90 @@ fn solve_part_one(input: &str) -> usize {
 
     map.insert(start_pos.clone(), start_tile_type.clone());
 
-    let mut step_count = 0;
+    let loop_tiles = get_loop_tiles(&map, Tile::new(start_pos, start_tile_type));
+    let steps = loop_tiles.len() / 2;
+    
+    steps
+}
+
+fn solve_part_two(input: &str) -> usize {
+    let mut map = parse_input(input);
+    let (start_pos, start_tile_type) = determine_start_tile(&map);
+
+    map.insert(start_pos.clone(), start_tile_type.clone());
+
+    let loop_tiles = get_loop_tiles(&map, Tile::new(start_pos, start_tile_type));
+    
+    for tile in loop_tiles {
+        map.remove(&tile.pos);
+    }
+
+    let tiles = map.iter()
+        .map(|(pos, ttype)| Tile::new(pos.clone(), *ttype))
+        .collect_vec();
+
+    let mut external_tiles: HashSet<Tile>=HashSet::new();
+    let mut enclosed_tiles: HashSet<Tile> = HashSet::new();
+
+    for tile in tiles {
+        if external_tiles.contains(&tile) || enclosed_tiles.contains(&tile) {
+            continue;
+        }
+
+        let reachable_tiles = traverse_breadth_first_enclosed_tiles(&map, &tile);
+
+        if reachable_tiles.iter().any(|t| t.pos.x == 0 || t.pos.y == 0 || external_tiles.contains(t)) {
+            external_tiles.extend(reachable_tiles);
+        } else {
+            enclosed_tiles.extend(reachable_tiles);
+        }
+    }
+
+    enclosed_tiles.len()
+}
+
+fn traverse_breadth_first_enclosed_tiles(map: &HashMap<Position, TileType>, start: &Tile) -> HashSet<Tile> {
+    let mut tiles_to_visit = HashSet::from([start.clone()]);
+    let mut visited_tiles = HashSet::new();
+
+    loop {
+        let mut next_tiles = HashSet::new();
+        for tile in tiles_to_visit.iter() {
+            let neighbor_tiles = get_positions_for_enclosed_tiles(map, &tile.pos)
+                .into_iter()
+                .filter(|t| !visited_tiles.contains(t));
+            next_tiles.extend(neighbor_tiles);
+        }
+
+        visited_tiles.extend(tiles_to_visit.clone());
+        tiles_to_visit = next_tiles;
+
+        if tiles_to_visit.is_empty() {
+            break;
+        }
+    }
+    
+    visited_tiles
+}
+
+fn get_positions_for_enclosed_tiles(map: &HashMap<Position, TileType>, pos: &Position) -> HashSet<Tile> {
+    // todo: fix this, super hacky
+    let ground = TileType::Start;
+    let positions = ground.get_adjacent_positions(pos, map);
+
+    positions
+        .iter()
+        .map(|pos| Tile::new(pos.clone(), *map.get(pos).unwrap()))
+        .collect::<HashSet<_>>()
+}
+
+fn get_loop_tiles(map: &HashMap<Position, TileType>, start: Tile) -> HashSet<Tile> {
     let mut visited_tiles: HashSet<Tile> = HashSet::new();
-    let mut tiles_to_visit = HashSet::from([Tile::new(start_pos, start_tile_type)]);
+    let mut tiles_to_visit = HashSet::from([start]);
 
     loop {
         let mut discovered_positions = HashSet::new();
+
         for tile in tiles_to_visit.iter() {
             let neighbors = get_adjacent_tiles(tile, &map)
                 .into_iter()
@@ -46,15 +124,9 @@ fn solve_part_one(input: &str) -> usize {
         if tiles_to_visit.is_empty() {
             break;
         }
-
-        step_count += 1;
     }
 
-    return step_count;
-}
-
-fn solve_part_two(input: &str) -> i32 {
-    unimplemented!()
+    visited_tiles
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
@@ -244,8 +316,11 @@ fn print_map(map: &HashMap<Position, TileType>) {
     for y in 0..=dimension.1 {
         let mut line = Vec::new();
         for x in 0..=dimension.0 {
-            let t = map.get(&Position::new(x, y)).unwrap();
-            line.push(t.to_char());
+            if let Some(t) = map.get(&Position::new(x, y))  {
+                line.push(t.to_char());
+            } else {
+                line.push(' ');
+            };
         }
         println!("{}", line.iter().collect::<String>());
     }
