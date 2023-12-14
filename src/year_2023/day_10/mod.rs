@@ -39,10 +39,18 @@ fn solve_part_two(input: &str) -> usize {
     map.insert(start_pos.clone(), start_tile_type.clone());
 
     let loop_tiles = get_loop_tiles(&map, Tile::new(start_pos, start_tile_type));
+    let double_horizontals = get_doubled_pipes(&map);
     
-    for tile in loop_tiles {
+    for tile in loop_tiles
+        .iter()
+        .filter(|t| !double_horizontals.contains(t))
+    {
         map.remove(&tile.pos);
     }
+
+    print_map(&map, &HashSet::new(), &HashSet::new());
+    println!("==============");
+
 
     let tiles = map.iter()
         .map(|(pos, ttype)| Tile::new(pos.clone(), *ttype))
@@ -50,6 +58,7 @@ fn solve_part_two(input: &str) -> usize {
 
     let mut external_tiles: HashSet<Tile>=HashSet::new();
     let mut enclosed_tiles: HashSet<Tile> = HashSet::new();
+    let (max_x, max_y) = get_map_size(&map);
 
     for tile in tiles {
         if external_tiles.contains(&tile) || enclosed_tiles.contains(&tile) {
@@ -58,14 +67,40 @@ fn solve_part_two(input: &str) -> usize {
 
         let reachable_tiles = traverse_breadth_first_enclosed_tiles(&map, &tile);
 
-        if reachable_tiles.iter().any(|t| t.pos.x == 0 || t.pos.y == 0 || external_tiles.contains(t)) {
+        if reachable_tiles.iter().any(|t| t.pos.x == 0 || t.pos.y == 0 || t.pos.x == max_x || t.pos.y == max_y || external_tiles.contains(t)) {
             external_tiles.extend(reachable_tiles);
         } else {
             enclosed_tiles.extend(reachable_tiles);
         }
     }
 
+
+    for doubled_horizontal in double_horizontals {
+        println!("removing horizontal: {:?}: {}", doubled_horizontal, enclosed_tiles.contains(&doubled_horizontal));
+        enclosed_tiles.remove(&doubled_horizontal);
+    }
+
+    print_map(&map, &enclosed_tiles, &external_tiles );
+
     enclosed_tiles.len()
+}
+
+fn get_doubled_pipes(map: &HashMap<Position, TileType>) -> HashSet<Tile> {
+    let mut x = get_doubled_tile(map, TileType::Horizontal, TileType::Vertical);
+    let y = get_doubled_tile(map, TileType::Vertical, TileType::Horizontal);
+    
+    x.extend(y);
+    x
+}
+
+fn get_doubled_tile(map: &HashMap<Position, TileType>, direction: TileType, opposite_direction: TileType) ->HashSet<Tile> {
+    map.iter()
+        .filter(|(_, &tt)| tt == direction)
+        .flat_map(|(pos, _)| opposite_direction.get_adjacent_positions(pos, map)
+            .into_iter()
+            .filter(|p| *map.get(p).unwrap() == direction))
+        .map(|pos| Tile::new(pos.clone(), *map.get(&pos).unwrap()))
+        .collect::<HashSet<_>>()
 }
 
 fn traverse_breadth_first_enclosed_tiles(map: &HashMap<Position, TileType>, start: &Tile) -> HashSet<Tile> {
@@ -93,13 +128,23 @@ fn traverse_breadth_first_enclosed_tiles(map: &HashMap<Position, TileType>, star
 }
 
 fn get_positions_for_enclosed_tiles(map: &HashMap<Position, TileType>, pos: &Position) -> HashSet<Tile> {
-    // todo: fix this, super hacky
-    let ground = TileType::Start;
-    let positions = ground.get_adjacent_positions(pos, map);
+    // let offsets = [
+    //     (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1) 
+    // ];
+    let mut offsets = vec![
+        (1, 0), (0, 1), (-1, 0), (0, -1), 
+    ];
+    
+    if false {
+        offsets.push((-1, 1))
+    }
 
-    positions
+
+    offsets
         .iter()
-        .map(|pos| Tile::new(pos.clone(), *map.get(pos).unwrap()))
+        .map(|(x, y)| Position::new(pos.x + x, pos.y + y))
+        .filter(|pos| map.contains_key(pos))
+        .map(|pos| Tile::new(pos.clone(), *map.get(&pos).unwrap()))
         .collect::<HashSet<_>>()
 }
 
@@ -310,16 +355,26 @@ fn get_adjacent_tiles(tile: &Tile, map: &HashMap<Position, TileType>) -> Vec<Til
         .collect_vec()
 }
 
-fn print_map(map: &HashMap<Position, TileType>) {
-    let dimension = map.keys().map(|pos| (pos.x, pos.y)).max().unwrap();
+fn get_map_size(map: &HashMap<Position, TileType>) -> (i32, i32) {
+    map.keys().map(|pos| (pos.x, pos.y)).max().unwrap()
+}
 
+fn print_map(map: &HashMap<Position, TileType>, enclosed_tiles: &HashSet<Tile>, outclosed_tiles: &HashSet<Tile>) {
+    let dimension = get_map_size(map);
     for y in 0..=dimension.1 {
         let mut line = Vec::new();
         for x in 0..=dimension.0 {
-            if let Some(t) = map.get(&Position::new(x, y))  {
-                line.push(t.to_char());
+            let pos = Position::new(x, y);
+            if let Some(t) = map.get(&pos)  {
+                if enclosed_tiles.iter().any(|t| t.pos == pos) {
+                    line.push('I');
+                } else if outclosed_tiles.iter().any(|t| t.pos == pos) {
+                    line.push('O');
+                } else {
+                    line.push(t.to_char());
+                }
             } else {
-                line.push(' ');
+                line.push('#');
             };
         }
         println!("{}", line.iter().collect::<String>());
