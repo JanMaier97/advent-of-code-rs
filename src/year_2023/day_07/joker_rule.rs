@@ -43,13 +43,6 @@ impl JokerRule {
             .map(|(&number, _)| *number)
             .unwrap_or(2);
 
-        // let Some(best_card) = best_card else {
-        //     println!("cards: {:?}", cards);
-        //     println!("non_joker_cards: {:?}", non_joker_cards);
-        //     println!("counts_by_number: {:?}", counts_by_number);
-        //     panic!();
-        // };
-
         cards
             .iter()
             .map(|&c| if c == 1 { best_card } else { c })

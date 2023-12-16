@@ -48,9 +48,6 @@ fn solve_part_two(input: &str) -> usize {
         map.remove(&tile.pos);
     }
 
-    print_map(&map, &HashSet::new(), &HashSet::new());
-    println!("==============");
-
     let tiles = map
         .iter()
         .map(|(pos, ttype)| Tile::new(pos.clone(), *ttype))
