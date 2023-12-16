@@ -27,9 +27,8 @@ fn solve_part_two(input: &str) -> usize {
     calculate_distance_sum(input, 1_000_000)
 }
 
-
 fn calculate_distance_sum(input: &str, expansion_rate: usize) -> usize {
-    let puzzle = parse_input(input,expansion_rate);
+    let puzzle = parse_input(input, expansion_rate);
     sum_distances(&puzzle)
 }
 
@@ -102,8 +101,8 @@ fn adjust_position(
     let y_offset = (0..=pos.1).filter(|y| empty_rows.contains(&y)).count();
 
     (
-        pos.0 + (x_offset * (expansion_rate-1)),
-        pos.1 + (y_offset * (expansion_rate-1)),
+        pos.0 + (x_offset * (expansion_rate - 1)),
+        pos.1 + (y_offset * (expansion_rate - 1)),
     )
 }
 
@@ -137,7 +136,7 @@ fn parse_empty_columns(input: &str) -> HashSet<usize> {
 
 #[cfg(test)]
 mod tests {
-    use crate::year_2023::day_11::{INPUT, solve_part_two, calculate_distance_sum};
+    use crate::year_2023::day_11::{calculate_distance_sum, solve_part_two, INPUT};
 
     use super::solve_part_one;
 
@@ -172,5 +171,4 @@ mod tests {
         let result = solve_part_two(INPUT);
         assert_eq!(result, 569052586852);
     }
-
 }
