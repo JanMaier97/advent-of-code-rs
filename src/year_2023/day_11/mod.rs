@@ -7,7 +7,8 @@ const INPUT: &str = include_str!("input.txt");
 pub fn solve() -> MyResult<()> {
     print_challenge_header(11);
 
-    println!("Sum of all shortest stuff: {}", solve_part_one(INPUT));
+    println!("Sum of all distances: {}", solve_part_one(INPUT));
+    println!("Sum of all distances: {}", solve_part_two(INPUT));
 
     Ok(())
 }
@@ -16,13 +17,23 @@ type Position = (usize, usize);
 
 struct PuzzleInput {
     galaxies: HashSet<Position>,
-    empty_rows: HashSet<usize>,
-    empty_columns: HashSet<usize>,
 }
 
 fn solve_part_one(input: &str) -> usize {
-    let puzzle = parse_input(input);
+    calculate_distance_sum(input, 2)
+}
 
+fn solve_part_two(input: &str) -> usize {
+    calculate_distance_sum(input, 1_000_000)
+}
+
+
+fn calculate_distance_sum(input: &str, expansion_rate: usize) -> usize {
+    let puzzle = parse_input(input,expansion_rate);
+    sum_distances(&puzzle)
+}
+
+fn sum_distances(puzzle: &PuzzleInput) -> usize {
     let mut total_distance = 0;
     let mut points_to_ignore = HashSet::new();
 
@@ -32,36 +43,33 @@ fn solve_part_one(input: &str) -> usize {
             if points_to_ignore.contains(&other_galaxy) {
                 continue;
             }
-            total_distance += calculate_distance(&galaxy, &other_galaxy, &puzzle);
+            total_distance += calculate_distance(&galaxy, &other_galaxy);
         }
     }
 
     total_distance
 }
 
-fn calculate_distance(pos_a: &Position, pos_b: &Position, puzzle: &PuzzleInput) -> usize {
+fn calculate_distance(pos_a: &Position, pos_b: &Position) -> usize {
     let x_difference = pos_a.0.abs_diff(pos_b.0);
     let y_difference = pos_a.1.abs_diff(pos_b.1);
 
     x_difference + y_difference
 }
 
-fn parse_input(input: &str) -> PuzzleInput {
+fn parse_input(input: &str, expansion_rate: usize) -> PuzzleInput {
     let empty_columns = parse_empty_columns(input);
     let empty_rows = parse_empty_rows(input);
-    let galaxies = parse_galaxies(input, &empty_columns, &empty_rows);
+    let galaxies = parse_galaxies(input, &empty_columns, &empty_rows, expansion_rate);
 
-    PuzzleInput {
-        galaxies,
-        empty_rows,
-        empty_columns,
-    }
+    PuzzleInput { galaxies }
 }
 
 fn parse_galaxies(
     input: &str,
     empty_columns: &HashSet<usize>,
     empty_rows: &HashSet<usize>,
+    expansion_rate: usize,
 ) -> HashSet<Position> {
     let mut galaxies = HashSet::new();
     for (line_idx, line) in input.lines().enumerate() {
@@ -70,7 +78,12 @@ fn parse_galaxies(
                 continue;
             }
 
-            let pos = adjust_position((char_idx, line_idx), empty_columns, empty_rows);
+            let pos = adjust_position(
+                (char_idx, line_idx),
+                empty_columns,
+                empty_rows,
+                expansion_rate,
+            );
 
             galaxies.insert(pos);
         }
@@ -83,11 +96,15 @@ fn adjust_position(
     pos: Position,
     empty_columns: &HashSet<usize>,
     empty_rows: &HashSet<usize>,
+    expansion_rate: usize,
 ) -> Position {
     let x_offset = (0..=pos.0).filter(|x| empty_columns.contains(&x)).count();
     let y_offset = (0..=pos.1).filter(|y| empty_rows.contains(&y)).count();
 
-    (pos.0 + x_offset, pos.1 + y_offset)
+    (
+        pos.0 + (x_offset * (expansion_rate-1)),
+        pos.1 + (y_offset * (expansion_rate-1)),
+    )
 }
 
 fn parse_empty_rows(input: &str) -> HashSet<usize> {
@@ -120,7 +137,7 @@ fn parse_empty_columns(input: &str) -> HashSet<usize> {
 
 #[cfg(test)]
 mod tests {
-    use crate::year_2023::day_11::INPUT;
+    use crate::year_2023::day_11::{INPUT, solve_part_two, calculate_distance_sum};
 
     use super::solve_part_one;
 
@@ -137,4 +154,23 @@ mod tests {
         let result = solve_part_one(INPUT);
         assert_eq!(result, 9724940);
     }
+
+    #[test]
+    pub fn solve_part_two_example_correctly_with_rate_10() {
+        let result = calculate_distance_sum(EXAMPLE, 10);
+        assert_eq!(result, 1030);
+    }
+
+    #[test]
+    pub fn solve_part_two_example_correctly_with_rate_100() {
+        let result = calculate_distance_sum(EXAMPLE, 100);
+        assert_eq!(result, 8410);
+    }
+
+    #[test]
+    pub fn solve_part_two_input_correctly() {
+        let result = solve_part_two(INPUT);
+        assert_eq!(result, 569052586852);
+    }
+
 }
