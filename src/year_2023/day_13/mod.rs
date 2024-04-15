@@ -1,7 +1,8 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
+use std::str::pattern::Pattern;
 
-use itertools::Itertools;
+use itertools::{Itertools, Position};
 
 use crate::{print_challenge_header, MyResult};
 
@@ -11,13 +12,19 @@ pub fn solve() -> MyResult<()> {
     print_challenge_header(13);
 
     println!("The number after summarizing is {}", solve_part_one(INPUT));
+    println!("The number after summarizing is {}", solve_part_two(INPUT));
 
     Ok(())
 }
 
 struct ParsedPattern {
-    rows: Vec<u64>,
-    columns: Vec<u64>,
+    rows: Vec<String>,
+    columns: Vec<String>,
+}
+
+struct ReflectionPoint {
+    index: usize,
+    smudges: Vec<Position>
 }
 
 fn solve_part_one(input: &str) -> usize {
@@ -29,6 +36,75 @@ fn solve_part_one(input: &str) -> usize {
         .sum();
 
     sum
+}
+
+fn solve_part_two(input: &str) -> usize {
+    let patterns = parse_input(input);
+
+    for pattern in patterns
+        .iter()
+        .skip(1) {
+            find_possible_smudge_in_pattern(&pattern.rows);
+            // fix_smudge_in_pattern(&pattern.rows);
+    }
+
+    return 0;
+}
+
+fn find_and_fix_smudge(pattern: &[String]) -> Option<usize> {
+    let positions = find_possible_smudge_in_pattern(pattern);
+    None
+}
+
+fn find_possible_smudge_in_pattern(pattern: &[String]) {
+    let points = find_all_possible_points_of_reflection(pattern)
+        .into_iter()
+        .collect_vec();
+
+    println!("found possible mirror points: {:?}", points);
+
+    for index in points {
+        let left = pattern.iter().take(index+1).rev();
+        let right = pattern.iter().skip(index+1);
+
+        for (offset, (left, right)) in left.zip(right).enumerate()  {
+            if left == right {
+                continue;
+            }
+
+            let Some(smudge_pos) = find_smudge(&left, &right) else {
+                println!("no smudge found");
+                return;
+            };
+
+            println!("found smudge for mirror point pattern");
+            println!("start idx: {}, outer idx: {}, inner idx: {}", index, index-offset, smudge_pos);
+            println!("{}\n{}", left, right);
+        }
+    }
+
+
+}
+
+fn find_smudge(a: &str, b: &str)-> Option<usize> {
+    let mut current_index = None;
+    for (index, (left, right)) in a.chars().zip(b.chars()).enumerate() {
+        if left == right {
+            continue;
+        }
+
+        if current_index != None {
+            return None;
+        }
+
+        current_index = Some(index);
+    }
+
+    current_index
+}
+
+fn replace_smudge(mut input: &str, index: usize) {
+
 }
 
 fn parse_input(input: &str) -> Vec<ParsedPattern> {
@@ -47,11 +123,11 @@ fn parse_pattern(pattern: &str) -> ParsedPattern {
     }
 }
 
-fn parse_pattern_by_row(pattern: &str) -> Vec<u64> {
-    pattern.lines().map(|l| calculate_hash(&l)).collect_vec()
+fn parse_pattern_by_row(pattern: &str) -> Vec<String> {
+    pattern.lines().map(|l| l.to_string()).collect_vec()
 }
 
-fn parse_pattern_by_column(pattern: &str) -> Vec<u64> {
+fn parse_pattern_by_column(pattern: &str) -> Vec<String> {
     let lines = pattern.lines().collect_vec();
     let mut columns = Vec::new();
 
@@ -61,7 +137,7 @@ fn parse_pattern_by_column(pattern: &str) -> Vec<u64> {
             .map(|l| l.chars().skip(idx).take(1).last().unwrap())
             .collect::<String>();
 
-        columns.push(calculate_hash(&column));
+        columns.push(column);
     }
 
     columns
@@ -79,14 +155,8 @@ fn calculate_number_for_pattern(pattern: &ParsedPattern) -> usize {
     panic!();
 }
 
-fn find_point_of_reflection(pattern: &[u64]) -> Option<usize> {
-    for (idx, window) in pattern.windows(2).enumerate() {
-        let (left, right) = (window[0], window[1]);
-
-        if left != right {
-            continue;
-        }
-
+fn find_point_of_reflection(pattern: &[String], edit_distance: u32) -> Option<usize> {
+    for idx in find_all_possible_points_of_reflection(pattern, edit_distance){
         if validate_reflection(pattern, idx) {
             return Some(idx + 1);
         }
@@ -95,7 +165,23 @@ fn find_point_of_reflection(pattern: &[u64]) -> Option<usize> {
     None
 }
 
-fn validate_reflection(pattern: &[u64], index: usize) -> bool {
+fn find_all_possible_points_of_reflection(pattern: &[String], edit_distance: u32) -> ReflectionPoint {
+    let mut indices = Vec::new();
+    for (idx, window) in pattern.windows(2).enumerate() {
+        let (left, right) = (&window[0], &window[1]);
+
+        if left != right {
+            continue;
+        }
+
+        indices.push(idx);
+    }
+
+    indices
+}
+
+
+fn validate_reflection(pattern: &[String], index: usize) -> bool {
     let left_side = pattern.iter().take(index + 1).rev();
     let right_side = pattern.iter().skip(index + 1);
 
@@ -108,9 +194,19 @@ fn calculate_hash<T: Hash>(t: &T) -> u64 {
     s.finish()
 }
 
+fn change_indices(a: &str, b: &str) -> Vec<usize> {
+    a.chars()
+        .zip(b.chars())
+        .enumerate()
+        .filter(|(idx, (a,b))| a != b )
+        .map(|(idx, _)| idx)
+        .collect_vec()
+
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::year_2023::day_13::INPUT;
+    use crate::year_2023::day_13::{INPUT, solve_part_two};
 
     use super::solve_part_one;
 
@@ -127,4 +223,11 @@ mod tests {
         let result = solve_part_one(INPUT);
         assert_eq!(result, 33780);
     }
+
+    #[test]
+    fn solve_part_two_example_correctly() {
+        let result = solve_part_two(EXAMPLE);
+        assert_eq!(result, 400);
+    }
+
 }
