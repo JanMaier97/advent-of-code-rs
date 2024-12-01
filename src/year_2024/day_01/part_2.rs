@@ -1,9 +1,13 @@
 use std::collections::HashMap;
 
-use crate::MyResult;
+use linkme::distributed_slice;
+
+use crate::{MyResult, SolverMetadata, SOLVERS};
 
 use super::parse_input;
 
+#[distributed_slice(SOLVERS)]
+static PART1_SOLVER: SolverMetadata<'static> = SolverMetadata {year: 2024, day: 1, part: 2, func: solve, input: super::INPUT };
 
 pub fn solve(input: &str) -> MyResult<u32> {
     let locations = parse_input(input)?;
@@ -13,7 +17,6 @@ pub fn solve(input: &str) -> MyResult<u32> {
         .sum();
     Ok(result)
 }
-
 
 fn get_frequencies(location_ids: &[u32]) -> HashMap<u32, u32> {
     let mut result = HashMap::new();

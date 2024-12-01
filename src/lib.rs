@@ -1,4 +1,6 @@
-use std::error::Error;
+use std::{collections::HashMap, error::Error};
+
+use linkme::distributed_slice;
 
 mod year_2022;
 pub mod year_2023;
@@ -6,12 +8,41 @@ mod year_2024;
 
 pub type MyResult<T> = Result<T, Box<dyn Error>>;
 
-pub fn run() -> MyResult<()> {
-    // year_2022::run()?;
-    // year_2023::run()?;
-    year_2024::run()?;
+pub struct ExecutionArgs {
+    pub year: u32,
+    pub day: u32,
+    pub part: u32,
+}
+
+pub fn run(args: ExecutionArgs) -> MyResult<()> {
+    let solvers = collect_solver_map()?;
+    
+    let date = SolverDate {year: args.year, day: args.day, part: args.part};
+    let Some(solver) =  solvers.get(&date) else {
+        return Err(format!("No solution for year {} day {:02} part {} exists yet", args.year, args.day, args.part).into());
+    };
+
+    let solution = (solver.func)(&solver.input)?;
+    
+    println!("Solution for year {} day {:02} part {}: {}", date.year, date.day, date.part, solution);
 
     Ok(())
+}
+
+fn collect_solver_map() -> MyResult<HashMap<SolverDate, SolverData<'static>>> {
+    let mut map = HashMap::new();
+    for solver in SOLVERS {
+        let date = SolverDate {year: solver.year, day: solver.day, part: solver.part};
+        if map.contains_key(&date) {
+            return Err(format!("Found duplicate solver entry for Year {} Day {:02} Part {}", date.year, date.day, date.part).into());
+        }
+
+        let data = SolverData {func: solver.func, input: solver.input};
+
+        map.insert(date, data);
+    }
+
+    Ok(map)
 }
 
 fn print_challenge_header(day: usize) {
@@ -25,4 +56,29 @@ fn print_challenge_header(day: usize) {
     println!("##{:^46}##", day_label);
     println!("{}", horizontal_border);
     println!();
+}
+
+type SolverFunc = fn(&str) -> MyResult<u32>;
+
+#[derive(Hash, Eq, PartialEq)]
+struct SolverDate {
+    year: u32,
+    day: u32,
+    part: u32,
+}
+
+struct SolverData<'a> {
+    func: SolverFunc,
+    input: &'a str,
+}
+
+#[distributed_slice]
+pub static SOLVERS: [SolverMetadata];
+
+struct SolverMetadata<'a> {
+    year: u32,
+    day: u32,
+    part: u32,
+    func: SolverFunc,
+    input: &'a str,
 }

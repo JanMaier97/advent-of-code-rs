@@ -1,4 +1,4 @@
-use crate::{print_challenge_header, MyResult};
+use crate::MyResult;
 
 mod part_1;
 mod part_2;
@@ -8,18 +8,6 @@ const INPUT: &str = include_str!("input.txt");
 struct ParsedLocation {
     list1: Vec<u32>,
     list2: Vec<u32>
-}
-
-pub fn solve() -> MyResult<()> {
-    print_challenge_header(1);
-
-    let part_one_result = part_1::solve(INPUT)?;
-    println!("Result for part one is {}", part_one_result);
-
-    let part_two_result = part_2::solve(INPUT)?;
-    println!("Result for part two is {}", part_two_result);
-
-    Ok(())
 }
 
 fn parse_input(input: &str) -> MyResult<ParsedLocation> {

@@ -12,6 +12,7 @@ once_cell = "1.16.0"
 regex = "1.7.0"
 criterion = { version = "0.4", features = ["html_reports"] }
 rayon = {version = "=1.8"}
+linkme = "0.3"
 
 [[bench]]
 name = "2023_day_05"

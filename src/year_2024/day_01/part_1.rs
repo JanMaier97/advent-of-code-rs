@@ -1,7 +1,11 @@
-use crate::MyResult;
+use linkme::distributed_slice;
+
+use crate::{MyResult, SolverMetadata, SOLVERS};
 
 use super::parse_input;
 
+#[distributed_slice(SOLVERS)]
+static PART1_SOLVER: SolverMetadata<'static> = SolverMetadata {year: 2024, day: 1, part: 1, func: solve, input: super::INPUT };
 
 pub fn solve(input: &str) -> MyResult<u32> {
     let mut locations = parse_input(input)?;
