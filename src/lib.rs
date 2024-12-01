@@ -9,6 +9,7 @@ pub type MyResult<T> = Result<T, Box<dyn Error>>;
 pub fn run() -> MyResult<()> {
     // year_2022::run()?;
     // year_2023::run()?;
+    year_2024::run()?;
 
     Ok(())
 }
