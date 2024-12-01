@@ -5,16 +5,19 @@ use linkme::distributed_slice;
 mod year_2022;
 pub mod year_2023;
 mod year_2024;
+mod cli;
 
 pub type MyResult<T> = Result<T, Box<dyn Error>>;
 
 pub struct ExecutionArgs {
-    pub year: u32,
-    pub day: u32,
-    pub part: u32,
+    pub year: u16,
+    pub day: u8,
+    pub part: u8,
 }
 
-pub fn run(args: ExecutionArgs) -> MyResult<()> {
+pub fn run() -> MyResult<()> {
+    let args = cli::parse_args()?;
+
     let solvers = collect_solver_map()?;
     
     let date = SolverDate {year: args.year, day: args.day, part: args.part};
@@ -62,9 +65,9 @@ type SolverFunc = fn(&str) -> MyResult<u32>;
 
 #[derive(Hash, Eq, PartialEq)]
 struct SolverDate {
-    year: u32,
-    day: u32,
-    part: u32,
+    year: u16,
+    day: u8,
+    part: u8,
 }
 
 struct SolverData<'a> {
@@ -76,9 +79,9 @@ struct SolverData<'a> {
 pub static SOLVERS: [SolverMetadata];
 
 struct SolverMetadata<'a> {
-    year: u32,
-    day: u32,
-    part: u32,
+    year: u16,
+    day: u8,
+    part: u8,
     func: SolverFunc,
     input: &'a str,
 }

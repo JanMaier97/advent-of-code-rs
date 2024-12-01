@@ -3,6 +3,10 @@ name = "advent_of_code_rs"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "aoc"
+path = "src/main.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -11,8 +15,10 @@ num = "0.4.0"
 once_cell = "1.16.0"
 regex = "1.7.0"
 criterion = { version = "0.4", features = ["html_reports"] }
-rayon = {version = "=1.8"}
+rayon = { version = "=1.8" }
 linkme = "0.3"
+clap = { version = "4.5.21", features = ["derive"] }
+trycmd = "0.15.8"
 
 [[bench]]
 name = "2023_day_05"
