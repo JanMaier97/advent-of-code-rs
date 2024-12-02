@@ -7,7 +7,7 @@ const INPUT: &str = include_str!("input.txt");
 
 struct ParsedLocation {
     list1: Vec<u32>,
-    list2: Vec<u32>
+    list2: Vec<u32>,
 }
 
 fn parse_input(input: &str) -> MyResult<ParsedLocation> {
@@ -27,6 +27,6 @@ fn parse_input(input: &str) -> MyResult<ParsedLocation> {
         list1.push(split[0]);
         list2.push(split[1]);
     }
-    
-    Ok(ParsedLocation {list1, list2})
+
+    Ok(ParsedLocation { list1, list2 })
 }

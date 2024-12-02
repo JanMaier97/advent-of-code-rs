@@ -7,22 +7,23 @@ const INPUT: &str = include_str!("input.txt");
 
 #[derive(Clone)]
 struct Record {
-    levels: Vec<u32>
+    levels: Vec<u32>,
 }
 
 #[derive(PartialEq)]
 enum Safety {
     Save,
-    Unsave
+    Unsave,
 }
 
 fn parse_input(input: &str) -> MyResult<Vec<Record>> {
     let mut records = Vec::new();
     for line in input.lines() {
-        let levels = line.split(" ")
+        let levels = line
+            .split(" ")
             .map(|n| n.parse::<u32>())
-            .collect::<Result<Vec<_>,_>>()?;
-            
+            .collect::<Result<Vec<_>, _>>()?;
+
         records.push(Record { levels });
     }
 
@@ -47,12 +48,14 @@ fn parse_and_count(input: &str, safety_strategy: fn(&Record) -> Safety) -> MyRes
 }
 
 fn all_levels_safe(record: &Record) -> Safety {
-    let diffs = record.levels
+    let diffs = record
+        .levels
         .windows(2)
         .map(|w| w[1] as i32 - w[0] as i32)
         .collect::<Vec<_>>();
 
-    let contains_invalid_difference = diffs.iter()
+    let contains_invalid_difference = diffs
+        .iter()
         .map(|level| level.abs())
         .any(|level| level < 1 || level > 3);
 
@@ -60,9 +63,7 @@ fn all_levels_safe(record: &Record) -> Safety {
         return Safety::Unsave;
     }
 
-    let contains_direction_change = diffs
-        .windows(2)
-        .any(|w| w[0].signum() != w[1].signum());
+    let contains_direction_change = diffs.windows(2).any(|w| w[0].signum() != w[1].signum());
 
     if contains_direction_change {
         Safety::Unsave

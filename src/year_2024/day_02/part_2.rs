@@ -7,7 +7,13 @@ use crate::{MyResult, SolverMetadata, SOLVERS};
 use super::{all_levels_safe, parse_and_count, Record, Safety};
 
 #[distributed_slice(SOLVERS)]
-static SOLVER: SolverMetadata<'static> = SolverMetadata {year: 2024, day: 2, part: 2, func: solve, input: super::INPUT };
+static SOLVER: SolverMetadata<'static> = SolverMetadata {
+    year: 2024,
+    day: 2,
+    part: 2,
+    func: solve,
+    input: super::INPUT,
+};
 
 fn solve(input: &str) -> MyResult<u32> {
     parse_and_count(input, with_problem_dampener)
@@ -33,18 +39,20 @@ fn with_problem_dampener(record: &Record) -> Safety {
     Safety::Unsave
 }
 
-
 struct WindowMap {
     indices: Vec<usize>,
-    value: i32
+    value: i32,
 }
 
 fn get_indices_of_unsave_levels(record: &Record) -> HashSet<usize> {
-
-    let level_diffs = record.levels
+    let level_diffs = record
+        .levels
         .windows(2)
         .enumerate()
-        .map(|(idx, w)|WindowMap{ indices: vec![idx, idx+1], value: w[1] as i32 - w[0] as i32})
+        .map(|(idx, w)| WindowMap {
+            indices: vec![idx, idx + 1],
+            value: w[1] as i32 - w[0] as i32,
+        })
         .collect::<Vec<_>>();
 
     let invalid_difference_indices = level_diffs
@@ -58,7 +66,7 @@ fn get_indices_of_unsave_levels(record: &Record) -> HashSet<usize> {
         .filter(|w| w[0].value.signum() != w[1].value.signum())
         .flat_map(|w| [w[0].indices.as_slice(), w[1].indices.as_slice()].concat())
         .collect::<HashSet<_>>();
-    
+
     invalid_difference_indices
         .union(&direction_change_indicies)
         .cloned()

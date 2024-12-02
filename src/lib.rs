@@ -2,10 +2,10 @@ use std::{collections::HashMap, error::Error};
 
 use linkme::distributed_slice;
 
+mod cli;
 mod year_2022;
 pub mod year_2023;
 mod year_2024;
-mod cli;
 
 pub type MyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -19,15 +19,26 @@ pub fn run() -> MyResult<()> {
     let args = cli::parse_args()?;
 
     let solvers = collect_solver_map()?;
-    
-    let date = SolverDate {year: args.year, day: args.day, part: args.part};
-    let Some(solver) =  solvers.get(&date) else {
-        return Err(format!("No solution for year {} day {:02} part {} exists yet", args.year, args.day, args.part).into());
+
+    let date = SolverDate {
+        year: args.year,
+        day: args.day,
+        part: args.part,
+    };
+    let Some(solver) = solvers.get(&date) else {
+        return Err(format!(
+            "No solution for year {} day {:02} part {} exists yet",
+            args.year, args.day, args.part
+        )
+        .into());
     };
 
     let solution = (solver.func)(&solver.input)?;
-    
-    println!("Solution for year {} day {:02} part {}: {}", date.year, date.day, date.part, solution);
+
+    println!(
+        "Solution for year {} day {:02} part {}: {}",
+        date.year, date.day, date.part, solution
+    );
 
     Ok(())
 }
@@ -35,12 +46,23 @@ pub fn run() -> MyResult<()> {
 fn collect_solver_map() -> MyResult<HashMap<SolverDate, SolverData<'static>>> {
     let mut map = HashMap::new();
     for solver in SOLVERS {
-        let date = SolverDate {year: solver.year, day: solver.day, part: solver.part};
+        let date = SolverDate {
+            year: solver.year,
+            day: solver.day,
+            part: solver.part,
+        };
         if map.contains_key(&date) {
-            return Err(format!("Found duplicate solver entry for Year {} Day {:02} Part {}", date.year, date.day, date.part).into());
+            return Err(format!(
+                "Found duplicate solver entry for Year {} Day {:02} Part {}",
+                date.year, date.day, date.part
+            )
+            .into());
         }
 
-        let data = SolverData {func: solver.func, input: solver.input};
+        let data = SolverData {
+            func: solver.func,
+            input: solver.input,
+        };
 
         map.insert(date, data);
     }

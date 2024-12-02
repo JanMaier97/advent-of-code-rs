@@ -16,13 +16,13 @@ struct CliArgs {
 }
 
 pub fn parse_args() -> MyResult<ExecutionArgs> {
-   let args = CliArgs::try_parse()?;
-   
-   let res = ExecutionArgs {
-    year: args.year,
-    day: args.day,
-    part: args.part,
-   };
+    let args = CliArgs::try_parse()?;
 
-   Ok(res)
+    let res = ExecutionArgs {
+        year: args.year,
+        day: args.day,
+        part: args.part,
+    };
+
+    Ok(res)
 }
