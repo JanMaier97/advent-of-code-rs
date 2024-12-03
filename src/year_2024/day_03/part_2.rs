@@ -51,7 +51,7 @@ fn parse_input(input: &str) -> MyResult<Vec<Operator>> {
         let line_ops = literal_regex
             .find_iter(line)
             .map(|c| c.as_str())
-            .map(|literal| parse_literal(literal))
+            .map(parse_literal)
             .collect::<Result<Vec<_>, _>>()?;
 
         operators.extend(line_ops);

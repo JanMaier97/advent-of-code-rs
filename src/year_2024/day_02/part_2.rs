@@ -22,7 +22,7 @@ fn solve(input: &str) -> MyResult<u32> {
 fn with_problem_dampener(record: &Record) -> Safety {
     let levels_to_remove = get_indices_of_unsave_levels(record);
 
-    if levels_to_remove.len() == 0 {
+    if levels_to_remove.is_empty() {
         return Safety::Save;
     }
 

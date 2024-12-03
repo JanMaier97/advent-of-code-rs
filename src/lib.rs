@@ -33,7 +33,7 @@ pub fn run() -> MyResult<()> {
         .into());
     };
 
-    let solution = (solver.func)(&solver.input)?;
+    let solution = (solver.func)(solver.input)?;
 
     println!(
         "Solution for year {} day {:02} part {}: {}",

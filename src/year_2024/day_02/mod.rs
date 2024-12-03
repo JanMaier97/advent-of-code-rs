@@ -20,7 +20,7 @@ fn parse_input(input: &str) -> MyResult<Vec<Record>> {
     let mut records = Vec::new();
     for line in input.lines() {
         let levels = line
-            .split(" ")
+            .split(' ')
             .map(|n| n.parse::<u32>())
             .collect::<Result<Vec<_>, _>>()?;
 
@@ -32,8 +32,8 @@ fn parse_input(input: &str) -> MyResult<Vec<Record>> {
 
 fn count_save_records(records: &[Record], safety_strategy: fn(&Record) -> Safety) -> u32 {
     let count = records
-        .into_iter()
-        .map(|r| safety_strategy(r))
+        .iter()
+        .map(safety_strategy)
         .filter(|safety| *safety == Safety::Save)
         .count();
 
@@ -56,8 +56,8 @@ fn all_levels_safe(record: &Record) -> Safety {
 
     let contains_invalid_difference = diffs
         .iter()
-        .map(|level| level.abs())
-        .any(|level| level < 1 || level > 3);
+        .map(|level: &i32| level.abs())
+        .any(|level| !(1..=3).contains(&level));
 
     if contains_invalid_difference {
         return Safety::Unsave;
