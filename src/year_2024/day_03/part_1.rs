@@ -9,7 +9,7 @@ static SOLVER: SolverMetadata<'static> = SolverMetadata {
     day: 3,
     part: 1,
     func: solve,
-    input: include_str!("input.txt"),
+    input: super::INPUT,
 };
 fn solve(input: &str) -> MyResult<u32> {
     let multiplications = parse_input(input)?;
@@ -44,7 +44,7 @@ fn parse_operands(op1: &str, op2: &str) -> MyResult<(u32, u32)> {
 
 #[cfg(test)]
 mod tests {
-    const EXAMPLE: &str = include_str!("example.txt");
+    const EXAMPLE: &str = include_str!("example1.txt");
 
     #[test]
     fn solve_example() {
