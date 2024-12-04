@@ -9,11 +9,11 @@ static SOLVER: SolverMetadata<'static> = SolverMetadata {
     day: 4,
     part: 1,
     func: solve,
-    input: include_str!("input.txt"),
+    input: super::INPUT,
 };
 
 fn solve(input: &str) -> MyResult<u32> {
-    let input = parse_input(input);
+    let input = super::parse_input(input);
 
     let mut sum = 0;
     for (row, line) in input.iter().enumerate() {
@@ -25,13 +25,6 @@ fn solve(input: &str) -> MyResult<u32> {
     }
 
     Ok(sum)
-}
-
-fn parse_input(input: &str) -> Vec<Vec<char>> {
-    input
-        .lines()
-        .map(|line| line.chars().collect::<Vec<_>>())
-        .collect::<Vec<_>>()
 }
 
 fn count2(row: usize, col: usize, input: &[Vec<char>]) -> u32 {
@@ -111,9 +104,7 @@ fn generate_diagonals(row: i32, col: i32) -> Vec<Vec<(i32, i32)>> {
         for col_dir in col_directions {
             let row_range = range_step(row, row + 4 * row_dir, row_dir);
             let col_range = range_step(col, col + 4 * col_dir, col_dir);
-            let positions = row_range
-                .zip(col_range)
-                .collect::<Vec<_>>();
+            let positions = row_range.zip(col_range).collect::<Vec<_>>();
             diagonals.push(positions);
         }
     }
