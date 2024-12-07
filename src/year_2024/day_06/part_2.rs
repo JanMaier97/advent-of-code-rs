@@ -1,4 +1,4 @@
-use std::{collections::HashSet, hash::Hash};
+use std::collections::HashSet;
 
 use crate::{MyResult, SolverMetadata, SOLVERS};
 use linkme::distributed_slice;
