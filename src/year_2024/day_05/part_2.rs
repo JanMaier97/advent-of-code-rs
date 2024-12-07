@@ -13,16 +13,16 @@ static SOLVER: SolverMetadata<'static> = SolverMetadata {
     input: super::INPUT,
 };
 
-fn solve(input: &str) -> MyResult<u32> {
+fn solve(input: &str) -> MyResult<u64> {
     let data = parse_input(input)?;
-    let result = data
+    let result: u32 = data
         .jobs
         .iter()
         .filter(|job| !is_job_correct(job, &data.rules))
         .map(|job| correct_job(job, &data.rules))
         .map(|pages| pages[pages.len() / 2].0)
         .sum();
-    Ok(result)
+    Ok(result.into())
 }
 
 fn correct_job(job: &PrintJob, rules: &PageRules) -> Vec<Page> {

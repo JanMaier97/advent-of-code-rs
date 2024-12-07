@@ -1,18 +1,20 @@
 use linkme::distributed_slice;
+use macros::aoc_solver;
 use num::range_step;
 
 use crate::{MyResult, SolverMetadata, SOLVERS};
 
-#[distributed_slice(SOLVERS)]
-static SOLVER: SolverMetadata<'static> = SolverMetadata {
-    year: 2024,
-    day: 4,
-    part: 1,
-    func: solve,
-    input: super::INPUT,
-};
+// #[distributed_slice(SOLVERS)]
+// static SOLVER: SolverMetadata<'static> = SolverMetadata {
+//     year: 2024,
+//     day: 4,
+//     part: 1,
+//     func: solve,
+//     input: super::INPUT,
+// };
 
-fn solve(input: &str) -> MyResult<u32> {
+#[aoc_solver]
+fn solve(input: &str) -> MyResult<u64> {
     let input = super::parse_input(input);
 
     let mut sum = 0;
@@ -24,7 +26,7 @@ fn solve(input: &str) -> MyResult<u32> {
         }
     }
 
-    Ok(sum)
+    Ok(sum.into())
 }
 
 fn count2(row: usize, col: usize, input: &[Vec<char>]) -> u32 {

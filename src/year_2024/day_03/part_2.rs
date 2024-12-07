@@ -22,7 +22,7 @@ static SOLVER: SolverMetadata<'static> = SolverMetadata {
     func: solve,
     input: super::INPUT,
 };
-fn solve(input: &str) -> MyResult<u32> {
+fn solve(input: &str) -> MyResult<u64> {
     let operators = parse_input(input)?;
 
     let mut sum = 0;
@@ -39,7 +39,7 @@ fn solve(input: &str) -> MyResult<u32> {
         }
     }
 
-    Ok(sum)
+    Ok(sum.into())
 }
 
 fn parse_input(input: &str) -> MyResult<Vec<Operator>> {

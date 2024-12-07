@@ -11,7 +11,7 @@ static SOLVER: SolverMetadata<'static> = SolverMetadata {
     input: super::INPUT,
 };
 
-fn solve(input: &str) -> MyResult<u32> {
+fn solve(input: &str) -> MyResult<u64> {
     let input = super::parse_input(input);
     let mut sum = 0;
 

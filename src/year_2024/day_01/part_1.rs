@@ -13,20 +13,20 @@ static PART1_SOLVER: SolverMetadata<'static> = SolverMetadata {
     input: super::INPUT,
 };
 
-pub fn solve(input: &str) -> MyResult<u32> {
+pub fn solve(input: &str) -> MyResult<u64> {
     let mut locations = parse_input(input)?;
 
     locations.list1.sort();
     locations.list2.sort();
 
-    let result = locations
+    let result: u32 = locations
         .list1
         .into_iter()
         .zip(locations.list2)
         .map(|(loc1, loc2)| loc1.abs_diff(loc2))
         .sum();
 
-    Ok(result)
+    Ok(result.into())
 }
 
 #[cfg(test)]

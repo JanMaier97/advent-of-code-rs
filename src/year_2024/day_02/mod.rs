@@ -40,11 +40,11 @@ fn count_save_records(records: &[Record], safety_strategy: fn(&Record) -> Safety
     count as u32
 }
 
-fn parse_and_count(input: &str, safety_strategy: fn(&Record) -> Safety) -> MyResult<u32> {
+fn parse_and_count(input: &str, safety_strategy: fn(&Record) -> Safety) -> MyResult<u64> {
     let records = parse_input(input)?;
     let count = count_save_records(&records, safety_strategy);
 
-    Ok(count)
+    Ok(count.into())
 }
 
 fn all_levels_safe(record: &Record) -> Safety {

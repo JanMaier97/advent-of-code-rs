@@ -11,12 +11,12 @@ static SOLVER: SolverMetadata<'static> = SolverMetadata {
     func: solve,
     input: super::INPUT,
 };
-fn solve(input: &str) -> MyResult<u32> {
+fn solve(input: &str) -> MyResult<u64> {
     let multiplications = parse_input(input)?;
 
-    let sum = multiplications.iter().map(|(op1, op2)| op1 * op2).sum();
+    let sum: u32 = multiplications.iter().map(|(op1, op2)| op1 * op2).sum();
 
-    Ok(sum)
+    Ok(sum.into())
 }
 
 fn parse_input(input: &str) -> MyResult<Vec<(u32, u32)>> {

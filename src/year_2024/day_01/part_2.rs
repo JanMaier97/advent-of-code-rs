@@ -15,15 +15,15 @@ static PART1_SOLVER: SolverMetadata<'static> = SolverMetadata {
     input: super::INPUT,
 };
 
-pub fn solve(input: &str) -> MyResult<u32> {
+pub fn solve(input: &str) -> MyResult<u64> {
     let locations = parse_input(input)?;
     let frequencies = get_frequencies(&locations.list2);
-    let result = locations
+    let result: u32 = locations
         .list1
         .into_iter()
         .map(|id| id * frequencies.get(&id).unwrap_or(&0))
         .sum();
-    Ok(result)
+    Ok(result.into())
 }
 
 fn get_frequencies(location_ids: &[u32]) -> HashMap<u32, u32> {

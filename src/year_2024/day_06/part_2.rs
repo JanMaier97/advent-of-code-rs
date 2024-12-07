@@ -14,11 +14,11 @@ static SOLVER: SolverMetadata<'static> = SolverMetadata {
     input: super::INPUT,
 };
 
-fn solve(input: &str) -> MyResult<u32> {
+fn solve(input: &str) -> MyResult<u64> {
     let (map, guard) = parse_input(input)?;
     let positions = generate_loop_possitions(guard, &map);
-
-    Ok(positions.len() as u32)
+    let result = u64::try_from(positions.len())?;
+    Ok(result)
 }
 
 fn generate_loop_possitions(guard: Guard, map: &Map) -> HashSet<Point> {

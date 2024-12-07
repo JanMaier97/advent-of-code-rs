@@ -13,7 +13,7 @@ static SOLVER: SolverMetadata<'static> = SolverMetadata {
     input: super::INPUT,
 };
 
-fn solve(input: &str) -> MyResult<u32> {
+fn solve(input: &str) -> MyResult<u64> {
     parse_and_count(input, all_levels_safe)
 }
 
