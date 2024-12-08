@@ -27,7 +27,7 @@ fn compute_solution(input: &str, operators: &[Operator]) -> MyResult<u64> {
 
     let result: u64 = equations
         .par_iter()
-        .filter(|eq| is_equation_valid(eq, &operators).unwrap())
+        .filter(|eq| is_equation_valid(eq, operators).unwrap())
         .map(|eq| eq.result)
         .sum();
 

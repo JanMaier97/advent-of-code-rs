@@ -17,7 +17,6 @@ fn solve(input: &str) -> MyResult<u64> {
     compute_solution(input, &[Operator::Add, Operator::Multiply])
 }
 
-
 #[cfg(test)]
 mod tests {
     #[test]

@@ -14,9 +14,11 @@ static SOLVER: SolverMetadata<'static> = SolverMetadata {
 };
 
 fn solve(input: &str) -> MyResult<u64> {
-    compute_solution(input, &[Operator::Add, Operator::Multiply, Operator::Concatenate])
+    compute_solution(
+        input,
+        &[Operator::Add, Operator::Multiply, Operator::Concatenate],
+    )
 }
-
 
 #[cfg(test)]
 mod tests {
