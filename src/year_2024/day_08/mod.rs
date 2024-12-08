@@ -7,6 +7,7 @@ use std::{
 use crate::MyResult;
 
 mod part_1;
+mod part_2;
 
 static INPUT: &str = include_str!("input.txt");
 
@@ -16,21 +17,21 @@ struct Dimensions {
     height: usize,
 }
 
+impl Dimensions {
+    fn is_in_bounds(&self, point: Point2) -> bool {
+        !(point.x < 0
+            || point.y < 0
+            || point.x as usize >= self.width
+            || point.y as usize >= self.height)
+    }
+}
+
 #[derive(Eq, PartialEq, Hash)]
 struct Frequency(char);
 
 struct Map {
     dim: Dimensions,
     frequencies: HashMap<Frequency, HashSet<Point2>>,
-}
-
-impl Map {
-    fn is_in_bounds(&self, point: Point2) -> bool {
-        !(point.x < 0
-            || point.y < 0
-            || point.x as usize >= self.dim.width
-            || point.y as usize >= self.dim.height)
-    }
 }
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
