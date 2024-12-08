@@ -1,20 +1,12 @@
 use std::collections::HashSet;
 
-use linkme::distributed_slice;
+use macros::aoc_solver;
 
-use crate::{year_2024::day_08::parse_map, MyResult, SolverMetadata, SOLVERS};
+use crate::{year_2024::day_08::parse_map, MyResult};
 
 use super::{Dimensions, Point2, Vec2};
 
-#[distributed_slice(SOLVERS)]
-static SOLVER: SolverMetadata<'static> = SolverMetadata {
-    year: 2024,
-    day: 8,
-    part: 2,
-    func: solve,
-    input: super::INPUT,
-};
-
+#[aoc_solver(2024, 8, 2, super::INPUT)]
 fn solve(input: &str) -> MyResult<u64> {
     let map = parse_map(input)?;
     let count = map

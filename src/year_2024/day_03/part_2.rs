@@ -1,8 +1,8 @@
-use linkme::distributed_slice;
+use macros::aoc_solver;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::{MyResult, SolverMetadata, SOLVERS};
+use crate::MyResult;
 
 const DO_NOT_PATTERN: &str = r"don't\(\)";
 const DO_PATTERN: &str = r"do\(\)";
@@ -14,14 +14,7 @@ enum Operator {
     Multiply(u32, u32),
 }
 
-#[distributed_slice(SOLVERS)]
-static SOLVER: SolverMetadata<'static> = SolverMetadata {
-    year: 2024,
-    day: 3,
-    part: 2,
-    func: solve,
-    input: super::INPUT,
-};
+#[aoc_solver(2024, 3, 2, super::INPUT)]
 fn solve(input: &str) -> MyResult<u64> {
     let operators = parse_input(input)?;
 

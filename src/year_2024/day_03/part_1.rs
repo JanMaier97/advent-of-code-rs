@@ -1,16 +1,9 @@
-use linkme::distributed_slice;
+use macros::aoc_solver;
 use regex::Regex;
 
-use crate::{MyResult, SolverMetadata, SOLVERS};
+use crate::MyResult;
 
-#[distributed_slice(SOLVERS)]
-static SOLVER: SolverMetadata<'static> = SolverMetadata {
-    year: 2024,
-    day: 3,
-    part: 1,
-    func: solve,
-    input: super::INPUT,
-};
+#[aoc_solver(2024, 3, 1, super::INPUT)]
 fn solve(input: &str) -> MyResult<u64> {
     let multiplications = parse_input(input)?;
 

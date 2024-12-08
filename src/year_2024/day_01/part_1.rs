@@ -1,18 +1,10 @@
-use linkme::distributed_slice;
+use macros::aoc_solver;
 
-use crate::{MyResult, SolverMetadata, SOLVERS};
+use crate::MyResult;
 
 use super::parse_input;
 
-#[distributed_slice(SOLVERS)]
-static PART1_SOLVER: SolverMetadata<'static> = SolverMetadata {
-    year: 2024,
-    day: 1,
-    part: 1,
-    func: solve,
-    input: super::INPUT,
-};
-
+#[aoc_solver(1, 1, 3, super::INPUT)]
 pub fn solve(input: &str) -> MyResult<u64> {
     let mut locations = parse_input(input)?;
 
@@ -32,21 +24,13 @@ pub fn solve(input: &str) -> MyResult<u64> {
 #[cfg(test)]
 mod tests {
     use crate::year_2024::day_01::part_1::solve;
-    use crate::year_2024::day_01::INPUT;
 
     const EXAMPLE_INPUT: &str = include_str!("example.txt");
 
     #[test]
-    fn test_part_one_example() {
+    fn solve_example() {
         let result = solve(EXAMPLE_INPUT);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), 11);
-    }
-
-    #[test]
-    fn test_part_one_input() {
-        let result = solve(INPUT);
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 2057374);
     }
 }

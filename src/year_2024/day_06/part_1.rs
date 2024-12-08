@@ -1,19 +1,12 @@
 use std::collections::HashSet;
 
-use crate::{MyResult, SolverMetadata, SOLVERS};
-use linkme::distributed_slice;
+use macros::aoc_solver;
+
+use crate::MyResult;
 
 use super::{determine_guard_path, parse_input, Direction, Guard, Map, Point};
 
-#[distributed_slice(SOLVERS)]
-static SOLVER: SolverMetadata<'static> = SolverMetadata {
-    year: 2024,
-    day: 6,
-    part: 1,
-    func: solve,
-    input: super::INPUT,
-};
-
+#[aoc_solver(2024, 6, 1, super::INPUT)]
 fn solve(input: &str) -> MyResult<u64> {
     let (map, guard) = parse_input(input)?;
     let positions = compute_guard_positions(guard, &map);

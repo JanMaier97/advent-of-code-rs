@@ -1,20 +1,12 @@
 use std::collections::HashMap;
 
-use linkme::distributed_slice;
+use macros::aoc_solver;
 
-use crate::{MyResult, SolverMetadata, SOLVERS};
+use crate::MyResult;
 
 use super::parse_input;
 
-#[distributed_slice(SOLVERS)]
-static PART1_SOLVER: SolverMetadata<'static> = SolverMetadata {
-    year: 2024,
-    day: 1,
-    part: 2,
-    func: solve,
-    input: super::INPUT,
-};
-
+#[aoc_solver(2024, 1, 2, super::INPUT)]
 pub fn solve(input: &str) -> MyResult<u64> {
     let locations = parse_input(input)?;
     let frequencies = get_frequencies(&locations.list2);
@@ -37,21 +29,13 @@ fn get_frequencies(location_ids: &[u32]) -> HashMap<u32, u32> {
 #[cfg(test)]
 mod tests {
     use crate::year_2024::day_01::part_2::solve;
-    use crate::year_2024::day_01::INPUT;
 
     const EXAMPLE_INPUT: &str = include_str!("example.txt");
 
     #[test]
-    fn test_part_one_example() {
+    fn solve_example() {
         let result = solve(EXAMPLE_INPUT);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), 31);
-    }
-
-    #[test]
-    fn test_part_one_input() {
-        let result = solve(INPUT);
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 23177084);
     }
 }

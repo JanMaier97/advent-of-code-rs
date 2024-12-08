@@ -1,19 +1,9 @@
-use linkme::distributed_slice;
 use macros::aoc_solver;
 use num::range_step;
 
-use crate::{MyResult, SolverMetadata, SOLVERS};
+use crate::MyResult;
 
-// #[distributed_slice(SOLVERS)]
-// static SOLVER: SolverMetadata<'static> = SolverMetadata {
-//     year: 2024,
-//     day: 4,
-//     part: 1,
-//     func: solve,
-//     input: super::INPUT,
-// };
-
-#[aoc_solver]
+#[aoc_solver(2024, 4, 1, super::INPUT)]
 fn solve(input: &str) -> MyResult<u64> {
     let input = super::parse_input(input);
 

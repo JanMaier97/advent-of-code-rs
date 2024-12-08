@@ -1,18 +1,10 @@
-use linkme::distributed_slice;
+use macros::aoc_solver;
 
-use crate::{MyResult, SolverMetadata, SOLVERS};
+use crate::MyResult;
 
 use super::{compute_solution, Operator};
 
-#[distributed_slice(SOLVERS)]
-static SOLVER: SolverMetadata<'static> = SolverMetadata {
-    year: 2024,
-    day: 7,
-    part: 1,
-    func: solve,
-    input: super::INPUT,
-};
-
+#[aoc_solver(2024, 7, 1, super::INPUT)]
 fn solve(input: &str) -> MyResult<u64> {
     compute_solution(input, &[Operator::Add, Operator::Multiply])
 }

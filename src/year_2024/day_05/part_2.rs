@@ -1,18 +1,10 @@
-use linkme::distributed_slice;
+use macros::aoc_solver;
 
-use crate::{MyResult, SolverMetadata, SOLVERS};
+use crate::MyResult;
 
 use super::{is_job_correct, parse_input, Page, PageRules, PrintJob};
 
-#[distributed_slice(SOLVERS)]
-static SOLVER: SolverMetadata<'static> = SolverMetadata {
-    year: 2024,
-    day: 5,
-    part: 2,
-    func: solve,
-    input: super::INPUT,
-};
-
+#[aoc_solver(2024, 5, 2, super::INPUT)]
 fn solve(input: &str) -> MyResult<u64> {
     let data = parse_input(input)?;
     let result: u32 = data
