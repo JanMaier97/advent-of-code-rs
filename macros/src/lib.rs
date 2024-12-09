@@ -15,7 +15,7 @@ impl Parse for AocInput {
         input.parse::<Token![,]>()?;
         let day: Expr = input.parse()?;
         input.parse::<Token![,]>()?;
-        let part: Expr = input.parse()?;
+        let part: Expr  = input.parse()?;
         input.parse::<Token![,]>()?;
         let input: Expr = input.parse()?;
 
@@ -23,7 +23,7 @@ impl Parse for AocInput {
             year,
             day,
             part,
-            input,
+            input
         })
     }
 }
@@ -31,10 +31,9 @@ impl Parse for AocInput {
 #[proc_macro_attribute]
 pub fn aoc_solver(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_macro_input!(args as AocInput);
-    let function = syn::parse::<syn::ItemFn>(item).expect("Attribute only supports functions");
+    let function  = syn::parse::<syn::ItemFn>(item).expect("Attribute only supports functions");
     let solver_ident = function.sig.ident.clone();
-    let variable_ident =
-        quote::format_ident!("{}_REGISTRATION", solver_ident.to_string().to_uppercase());
+    let variable_ident = quote::format_ident!("{}_REGISTRATION", solver_ident.to_string().to_uppercase());
 
     let year = args.year;
     let day = args.day;
@@ -42,10 +41,8 @@ pub fn aoc_solver(args: TokenStream, item: TokenStream) -> TokenStream {
     let input = args.input;
 
     let gen = quote! {
-        use linkme::distributed_slice;
-        use crate::{SolverMetadata, SOLVERS};
-        #[distributed_slice(SOLVERS)]
-        static #variable_ident: SolverMetadata<'static> = SolverMetadata {
+        #[linkme::distributed_slice(crate::SOLVERS)]
+        static #variable_ident: crate::SolverMetadata<'static> = crate::SolverMetadata {
             year: #year,
             day: #day,
             part: #part,

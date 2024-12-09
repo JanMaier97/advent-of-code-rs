@@ -34,7 +34,7 @@ fn generate_loop_possitions(guard: Guard, map: &Map) -> HashSet<Point> {
 }
 
 fn check_is_loop(guard: Guard, map: &Map) -> bool {
-    let mut bi_grams: HashSet<(Guard, Guard)> = HashSet::new();
+    let mut bi_grams: HashSet<Guard> = HashSet::new();
 
     let mut current_guard = guard;
     loop {
@@ -42,12 +42,11 @@ fn check_is_loop(guard: Guard, map: &Map) -> bool {
             return false;
         };
 
-        let bi_gram = (current_guard, next_guard);
-        if bi_grams.contains(&bi_gram) {
+        if bi_grams.contains(&next_guard) {
             return true;
         }
 
-        bi_grams.insert(bi_gram);
+        bi_grams.insert(next_guard);
 
         current_guard = next_guard;
     }
