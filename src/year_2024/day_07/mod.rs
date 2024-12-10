@@ -57,7 +57,7 @@ fn compute_result(operands: &[u64], operators: &[Operator]) -> MyResult<u64> {
     if operands.len() != operators.len() + 1 {
         return Err("Invalid amount of operators for the number of operands".into());
     }
-    
+
     let mut result = operands[0];
     for (b, operator) in operands.iter().skip(1).zip(operators) {
         result = apply_operator(result, *b, *operator);
