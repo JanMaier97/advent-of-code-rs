@@ -1,24 +1,21 @@
-use itertools::Itertools;
 use macros::aoc_solver;
 
 use crate::MyResult;
 
-type BlockSize = u32;
-type FileId = usize;
+use super::BlockType;
 
-struct DiskMap {
-    files: Vec<BlockSize>,
-    free_spaces: Vec<BlockSize>,
-}
 
 #[aoc_solver(2024, 9, 1, super::INPUT)]
 fn solve(input: &str) -> MyResult<u64> {
-    let disk_map = parse_input(input)?;
-    let proper_disk = defragment_disk(&disk_map);
-    let sum: usize = proper_disk
+    let mut blocks = parse_input(input)?;
+    defragment_disk(&mut blocks);
+    let sum: usize = blocks
         .iter()
         .enumerate()
-        .map(|(idx, file_id)| idx * file_id)
+        .map(|(idx, block)| idx * match *block {
+            BlockType::File(file_id) => file_id,
+            BlockType::Space => 0,
+        })
         .sum();
 
     let sum = u64::try_from(sum)?;
@@ -26,79 +23,65 @@ fn solve(input: &str) -> MyResult<u64> {
     Ok(sum)
 }
 
-fn defragment_disk(map: &DiskMap) -> Vec<FileId> {
-    let mut blocks = Vec::new();
-    let mut spaces = map.free_spaces.iter().cloned().rev().collect_vec();
-    let mut files = map.files.clone();
-    let mut right_file: FileId = files.len() - 1;
+fn defragment_disk(blocks: &mut Vec<BlockType>) {
+    let mut right_idx = blocks.len()-1;
 
-    for left_file in 0..files.len() {
-        let size = files[left_file];
+    for left_idx in 0..blocks.len() {
 
-        for _ in 0..size {
-            blocks.push(left_file);
-        }
+        match blocks[left_idx] {
+            BlockType::File(_) => continue,
+            BlockType::Space => {
+                let Some(idx) = next_file_index_from_behind(blocks, right_idx) else {
+                    continue;
+                };
+                
+                right_idx = idx;
 
-        let Some(mut free_blocks) = spaces.pop() else {
-            continue;
+                if left_idx >= right_idx {
+                    break;
+                }
+
+                blocks[left_idx] = blocks[right_idx];
+                blocks[right_idx] = BlockType::Space;
+            },
         };
+    }
+}
 
-        'inner: loop {
-            let size = files[right_file];
-
-            if right_file <= left_file {
-                return blocks;
-            }
-
-            for _ in 0..free_blocks.min(size) {
-                blocks.push(right_file);
-            }
-
-            if free_blocks > size {
-                free_blocks -= size;
-                right_file -= 1;
-                continue;
-            }
-
-            if free_blocks == size {
-                right_file -= 1;
-            }
-
-            if size > free_blocks {
-                files[right_file] = size - free_blocks;
-            }
-
-            break 'inner;
+fn next_file_index_from_behind(blocks: &Vec<BlockType>, current_idx: usize) -> Option<usize> {
+    for idx in (0..=current_idx).rev(){
+        if let BlockType::File(_) = blocks[idx] {
+            return Some(idx);
         }
     }
 
-    blocks
+    None
 }
 
-fn parse_input(input: &str) -> MyResult<DiskMap> {
+fn parse_input(input: &str) -> MyResult<Vec<BlockType>> {
     if input.lines().count() != 1 {
         return Err("Input must be only 1 line".into());
     }
 
-    let mut files = Vec::new();
-    let mut free_spaces = Vec::new();
+    let mut blocks = Vec::new();
 
     for (idx, c) in input.chars().enumerate() {
         let size = c.to_digit(10).ok_or("Not a number")?;
+        let block_type: BlockType; 
         if idx % 2 == 0 {
-            files.push(size);
+            block_type = BlockType::File(idx/2);
         } else {
-            free_spaces.push(size);
+            block_type = BlockType::Space;
+        }
+
+        for _ in 0..size {
+            blocks.push(block_type);
         }
     }
 
-    let map = DiskMap {
-        files: files,
-        free_spaces,
-    };
-
-    Ok(map)
+    Ok(blocks)
 }
+
 
 #[cfg(test)]
 mod tests {
