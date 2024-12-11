@@ -14,8 +14,6 @@ mod day_11;
 // mod day_13;
 
 pub fn run() -> MyResult<()> {
-    day_01::solve()?;
-    day_02::solve()?;
     day_03::solve()?;
     day_04::solve()?;
     // day_05::solve()?;

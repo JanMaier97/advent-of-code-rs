@@ -1,4 +1,6 @@
-use crate::{print_challenge_header, MyResult};
+use macros::aoc_solver;
+
+use crate::MyResult;
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -22,27 +24,22 @@ struct Game {
     sets: Vec<GameSet>,
 }
 
-pub fn solve() -> MyResult<()> {
-    print_challenge_header(2);
-    println!("The sum of ids is: {}", solve_part_one(INPUT)?);
-    println!("The sum of game powers is: {}", solve_part_two(INPUT)?);
 
-    Ok(())
-}
-
-fn solve_part_one(input: &str) -> MyResult<usize> {
+#[aoc_solver(2023, 2, 1, INPUT)]
+fn solve_part_one(input: &str) -> MyResult<u64> {
     let games = parse_input(input)?;
 
-    let sum = games
-        .iter()
+    let sum: u64 = games.iter()
         .filter(|game| game_is_possible(12, 13, 14, &game))
         .map(|game| game.id)
-        .sum();
-
+        .sum::<usize>()
+        .try_into()?;
+        
     return Ok(sum);
 }
 
-fn solve_part_two(input: &str) -> MyResult<usize> {
+#[aoc_solver(2023, 2, 2, INPUT)]
+fn solve_part_two(input: &str) -> MyResult<u64> {
     let games = parse_input(input)?;
     let mut total_power = 0;
 
@@ -54,7 +51,7 @@ fn solve_part_two(input: &str) -> MyResult<usize> {
         total_power += blue_power * green_power * red_power;
     }
 
-    return Ok(total_power);
+    return Ok(total_power.try_into()?);
 }
 
 fn get_power_for_color(game: &Game, color: Color) -> usize {

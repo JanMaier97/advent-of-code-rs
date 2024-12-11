@@ -1,6 +1,8 @@
 use std::{cmp::max, collections::HashSet};
 
-use crate::{print_challenge_header, MyResult};
+use macros::aoc_solver;
+
+use crate::MyResult;
 
 const INPUT: &str = include_str!("input.txt");
 const SPELLED_DIGIT: [&str; 9] = [
@@ -9,7 +11,7 @@ const SPELLED_DIGIT: [&str; 9] = [
 
 #[derive(Debug, Hash, Eq)]
 struct Digit {
-    value: usize,
+    value: u64,
     index: usize,
 }
 
@@ -19,27 +21,17 @@ impl PartialEq for Digit {
     }
 }
 
-pub fn solve() -> MyResult<()> {
-    print_challenge_header(1);
-
-    let part_one_result = solve_part_one(INPUT)?;
-    println!("Result for part one is {}", part_one_result);
-
-    let part_two_result = solve_part_two(INPUT)?;
-    println!("Result for part two is {}", part_two_result);
-
-    Ok(())
-}
-
-fn solve_part_one(input: &str) -> MyResult<usize> {
+#[aoc_solver(2023, 1, 1, INPUT)]
+fn solve_part_one(input: &str) -> MyResult<u64> {
     compute_value(input, find_raw_digits)
 }
 
-fn solve_part_two(input: &str) -> MyResult<usize> {
+#[aoc_solver(2023, 1, 2, INPUT)]
+fn solve_part_two(input: &str) -> MyResult<u64> {
     compute_value(input, find_raw_and_spelled_digits)
 }
 
-fn compute_value<F>(input: &str, digit_finder: F) -> MyResult<usize>
+fn compute_value<F>(input: &str, digit_finder: F) -> MyResult<u64>
 where
     F: Fn(&str) -> Vec<Digit>,
 {
@@ -63,7 +55,7 @@ fn find_raw_and_spelled_digits(line: &str) -> Vec<Digit> {
     digits
 }
 
-fn compute_value_of_digits(digits: &[Digit]) -> MyResult<usize> {
+fn compute_value_of_digits(digits: &[Digit]) -> MyResult<u64> {
     let first_digit = digits.first().ok_or("No digits found in line")?;
     let last_digit = digits.last().ok_or("No digits found in line")?;
 
@@ -74,7 +66,7 @@ fn compute_value_of_digits(digits: &[Digit]) -> MyResult<usize> {
 fn find_raw_digits(line: &str) -> Vec<Digit> {
     let res = line
         .chars()
-        .map(|c| c.to_string().parse::<usize>().ok())
+        .map(|c| c.to_string().parse::<u64>().ok())
         .enumerate()
         .map(|(index, option)| option.map(|value| Digit { value, index }))
         .flatten()
@@ -104,7 +96,7 @@ fn collect_digits_from_windows(
         .enumerate()
         .filter(|(_, window)| *window == digit_name)
         .map(|(index, _)| Digit {
-            value: digit_value,
+            value: u64::try_from(digit_value).unwrap(),
             index,
         })
         .collect::<Vec<_>>()
