@@ -4,7 +4,7 @@ use crate::MyResult;
 
 use super::parse_input;
 
-#[aoc_solver(1, 1, 3, super::INPUT)]
+#[aoc_solver(2024, 1, 1, super::INPUT)]
 pub fn solve(input: &str) -> MyResult<u64> {
     let mut locations = parse_input(input)?;
 
