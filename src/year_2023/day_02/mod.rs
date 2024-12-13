@@ -24,17 +24,17 @@ struct Game {
     sets: Vec<GameSet>,
 }
 
-
 #[aoc_solver(2023, 2, 1, INPUT)]
 fn solve_part_one(input: &str) -> MyResult<u64> {
     let games = parse_input(input)?;
 
-    let sum: u64 = games.iter()
+    let sum: u64 = games
+        .iter()
         .filter(|game| game_is_possible(12, 13, 14, &game))
         .map(|game| game.id)
         .sum::<usize>()
         .try_into()?;
-        
+
     return Ok(sum);
 }
 

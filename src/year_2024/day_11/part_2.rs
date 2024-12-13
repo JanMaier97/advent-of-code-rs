@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 
 use macros::aoc_solver;
@@ -13,12 +12,17 @@ fn solve(input: &str) -> MyResult<u64> {
 }
 
 fn blink(times: usize, values: Vec<u64>) -> u64 {
-    values.iter()
+    values
+        .iter()
         .map(|value| count_recursively(*value, times, &mut HashMap::new()))
         .sum()
 }
 
-fn count_recursively(value: u64, blink_count: usize, results: &mut HashMap<(u64, usize), u64>) -> u64 {
+fn count_recursively(
+    value: u64,
+    blink_count: usize,
+    results: &mut HashMap<(u64, usize), u64>,
+) -> u64 {
     if let Some(count) = results.get(&(value, blink_count)) {
         return *count;
     }
@@ -38,9 +42,9 @@ fn count_recursively(value: u64, blink_count: usize, results: &mut HashMap<(u64,
     if digit_count % 2 == 0 {
         let middle = digit_count / 2;
         let div = 10_u64.pow(middle as u32);
-        
-        let count1 = count_recursively(value/div, blink_count - 1, results);
-        let count2 =count_recursively(value%div, blink_count - 1, results);
+
+        let count1 = count_recursively(value / div, blink_count - 1, results);
+        let count2 = count_recursively(value % div, blink_count - 1, results);
         results.insert((value, blink_count), count1 + count2);
         return count1 + count2;
     }
@@ -63,7 +67,6 @@ fn count_digits(value: u64) -> usize {
     }
     count
 }
-
 
 #[cfg(test)]
 mod tests {
