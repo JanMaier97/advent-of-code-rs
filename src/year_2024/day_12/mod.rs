@@ -5,6 +5,7 @@ use itertools::Itertools;
 use crate::MyResult;
 
 mod part_1;
+mod part_2;
 
 const INPUT: &str = include_str!("input.txt");
 
