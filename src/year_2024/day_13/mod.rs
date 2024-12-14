@@ -5,13 +5,14 @@ use regex::Regex;
 use crate::MyResult;
 
 mod part_1;
+mod part_2;
 
 const INPUT: &str = include_str!("input.txt");
 
 #[derive(Clone, Copy)]
 struct Vec2 {
-    x: i32,
-    y: i32,
+    x: i64,
+    y: i64,
 }
 
 #[derive(Clone, Copy)]
@@ -21,12 +22,25 @@ struct Machine {
     price: Vec2,
 }
 
-fn solve_for_input(input: &str) -> MyResult<u64> {
+fn solve_for_input(input: &str, offset: i64) -> MyResult<u64> {
     let machines = parse_input(input)?;
-
+    let machines = machines.iter()
+        .map(|m| apply_offset(*m, offset))
+        .collect_vec();
     let sum = machines.iter().map(|m| compute_required_token(*m)).sum();
 
     Ok(sum)
+}
+
+fn apply_offset(machine: Machine, offset: i64) -> Machine {
+    Machine {
+        button_a: machine.button_a,
+        button_b: machine.button_b,
+        price: Vec2 {
+            x: machine.price.x + offset,
+            y: machine.price.y + offset,
+        }
+    }
 }
 
 fn parse_input(input: &str) -> MyResult<Vec<Machine>> {
@@ -55,8 +69,8 @@ fn parse_price(line: &str) -> MyResult<Vec2> {
     static PRICE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"Prize: X=(\d+), Y=(\d+)").unwrap());
     let capture = PRICE_REGEX.captures(line).ok_or("Invalid a button input")?;
     let price = Vec2 {
-        x: capture[1].parse::<i32>()?,
-        y: capture[2].parse::<i32>()?,
+        x: capture[1].parse::<i64>()?,
+        y: capture[2].parse::<i64>()?,
     };
 
     Ok(price)
@@ -71,10 +85,10 @@ fn parse_button(line: &str) -> MyResult<Vec2> {
         .ok_or("Invalid a button input")?;
     let btn = Vec2 {
         x: capture[1]
-            .parse::<i32>()
+            .parse::<i64>()
             .expect(format!("failed to parse {}", capture[0].to_string()).as_str()),
         y: capture[2]
-            .parse::<i32>()
+            .parse::<i64>()
             .expect(format!("failed to parse {}", capture[0].to_string()).as_str()),
     };
 
@@ -90,14 +104,14 @@ fn compute_required_token(machine: Machine) -> u64 {
     0
 }
 
-fn find_tokens(machine: Machine) -> (i32, i32) {
+fn find_tokens(machine: Machine) -> (i64, i64) {
     let token_b = compute_b_tokens(machine);
     let token_a = compute_a_tokens(token_b, machine);
 
     (token_a, token_b)
 }
 
-fn are_tokens_correct(token_a: i32, token_b: i32, machine: Machine) -> bool {
+fn are_tokens_correct(token_a: i64, token_b: i64, machine: Machine) -> bool {
     let p = machine.price;
     let a = machine.button_a;
     let b = machine.button_b;
@@ -105,11 +119,11 @@ fn are_tokens_correct(token_a: i32, token_b: i32, machine: Machine) -> bool {
     p.x == token_a * a.x + token_b * b.x && p.y == token_a * a.y + token_b * b.y
 }
 
-fn compute_a_tokens(b_token: i32, machine: Machine) -> i32 {
+fn compute_a_tokens(b_token: i64, machine: Machine) -> i64 {
     (machine.price.y - b_token * machine.button_b.y) / machine.button_a.y
 }
 
-fn compute_b_tokens(machine: Machine) -> i32 {
+fn compute_b_tokens(machine: Machine) -> i64 {
     let price = machine.price;
     let a_btn = machine.button_a;
     let b_btn = machine.button_b;
