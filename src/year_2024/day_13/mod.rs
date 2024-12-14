@@ -24,7 +24,8 @@ struct Machine {
 
 fn solve_for_input(input: &str, offset: i64) -> MyResult<u64> {
     let machines = parse_input(input)?;
-    let machines = machines.iter()
+    let machines = machines
+        .iter()
         .map(|m| apply_offset(*m, offset))
         .collect_vec();
     let sum = machines.iter().map(|m| compute_required_token(*m)).sum();
@@ -39,14 +40,14 @@ fn apply_offset(machine: Machine, offset: i64) -> Machine {
         price: Vec2 {
             x: machine.price.x + offset,
             y: machine.price.y + offset,
-        }
+        },
     }
 }
 
 fn parse_input(input: &str) -> MyResult<Vec<Machine>> {
     input
         .split("\r\n\r\n")
-        .map(|block| parse_machine(block))
+        .map(parse_machine)
         .collect::<Result<Vec<_>, _>>()
 }
 
@@ -84,12 +85,8 @@ fn parse_button(line: &str) -> MyResult<Vec2> {
         .captures(line)
         .ok_or("Invalid a button input")?;
     let btn = Vec2 {
-        x: capture[1]
-            .parse::<i64>()
-            .expect(format!("failed to parse {}", capture[0].to_string()).as_str()),
-        y: capture[2]
-            .parse::<i64>()
-            .expect(format!("failed to parse {}", capture[0].to_string()).as_str()),
+        x: capture[1].parse::<i64>()?,
+        y: capture[2].parse::<i64>()?,
     };
 
     Ok(btn)

@@ -1,4 +1,4 @@
-use std::{ops::{Add, Mul, Rem}, process::Output};
+use std::ops::{Add, Mul, Rem};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -33,7 +33,7 @@ impl<T: Mul<Output = T> + Clone> Mul<T> for Vec2<T> {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-struct Point<T>{
+struct Point<T> {
     x: T,
     y: T,
 }
@@ -44,7 +44,7 @@ impl<T: Add<Output = T>> Add<Vec2<T>> for Point<T> {
     fn add(self, rhs: Vec2<T>) -> Self::Output {
         Point {
             x: self.x + rhs.x,
-            y: self.y + rhs.y
+            y: self.y + rhs.y,
         }
     }
 }
@@ -60,11 +60,6 @@ impl<T: Rem<Output = T> + Clone> std::ops::Rem<T> for Point<T> {
     }
 }
 
-struct Map {
-    robots: Vec<Robot>,
-    dim: Dimensions
-}
-
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 struct Robot {
     pos: Point<u64>,
@@ -72,14 +67,16 @@ struct Robot {
 }
 
 fn parse_input(input: &str) -> MyResult<Vec<Robot>> {
-    input.lines()
-        .map(|l| parse_robot(l))
+    input
+        .lines()
+        .map(parse_robot)
         .collect::<Result<Vec<_>, _>>()
 }
 
 fn parse_robot(line: &str) -> MyResult<Robot> {
-    static REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"p=(\d+),(\d+) v=(-?\d+),(-?\d+)").unwrap());
-    
+    static REGEX: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r"p=(\d+),(\d+) v=(-?\d+),(-?\d+)").unwrap());
+
     let caputres = REGEX.captures(line).ok_or("Invalid line")?;
     let pos = Point {
         x: caputres[1].parse::<u64>()?,
@@ -90,7 +87,5 @@ fn parse_robot(line: &str) -> MyResult<Robot> {
         y: caputres[4].parse::<i32>()?,
     };
 
-    Ok(Robot {
-        pos, velocity: vel
-    })
+    Ok(Robot { pos, velocity: vel })
 }

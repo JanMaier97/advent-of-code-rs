@@ -8,7 +8,7 @@ use crate::{year_2024::day_11::parse_input, MyResult};
 fn solve(input: &str) -> MyResult<u64> {
     let values = parse_input(input)?;
     let count = blink(75, values);
-    Ok(count.try_into()?)
+    Ok(count)
 }
 
 fn blink(times: usize, values: Vec<u64>) -> u64 {
