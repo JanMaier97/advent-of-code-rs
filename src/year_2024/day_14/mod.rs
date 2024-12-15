@@ -1,65 +1,15 @@
-use std::ops::{Add, Mul, Rem};
-
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::MyResult;
+use crate::{
+    common::math_2d::{Dimensions, Point, Vec2},
+    MyResult,
+};
 
 mod part_1;
 mod part_2;
 
 const INPUT: &str = include_str!("input.txt");
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-struct Dimensions {
-    height: u64,
-    width: u64,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-struct Vec2<T> {
-    x: T,
-    y: T,
-}
-
-impl<T: Mul<Output = T> + Clone> Mul<T> for Vec2<T> {
-    type Output = Self;
-
-    fn mul(self, rhs: T) -> Self::Output {
-        Vec2 {
-            x: self.x * rhs.clone(),
-            y: self.y * rhs,
-        }
-    }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
-struct Point<T> {
-    x: T,
-    y: T,
-}
-
-impl<T: Add<Output = T>> Add<Vec2<T>> for Point<T> {
-    type Output = Point<T>;
-
-    fn add(self, rhs: Vec2<T>) -> Self::Output {
-        Point {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-        }
-    }
-}
-
-impl<T: Rem<Output = T> + Clone> std::ops::Rem<T> for Point<T> {
-    type Output = Self;
-
-    fn rem(self, rhs: T) -> Self::Output {
-        Self {
-            x: self.x % rhs.clone(),
-            y: self.y % rhs,
-        }
-    }
-}
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 struct Robot {
@@ -79,14 +29,8 @@ fn parse_robot(line: &str) -> MyResult<Robot> {
         Lazy::new(|| Regex::new(r"p=(\d+),(\d+) v=(-?\d+),(-?\d+)").unwrap());
 
     let caputres = REGEX.captures(line).ok_or("Invalid line")?;
-    let pos = Point {
-        x: caputres[1].parse::<u64>()?,
-        y: caputres[2].parse::<u64>()?,
-    };
-    let vel = Vec2 {
-        x: caputres[3].parse::<i32>()?,
-        y: caputres[4].parse::<i32>()?,
-    };
+    let pos = Point::new(caputres[1].parse::<u64>()?, caputres[2].parse::<u64>()?);
+    let vel = Vec2::new(caputres[3].parse::<i32>()?, caputres[4].parse::<i32>()?);
 
     Ok(Robot { pos, velocity: vel })
 }
@@ -95,17 +39,14 @@ fn move_robot(robot: Robot, dim: Dimensions, times: u64) -> MyResult<Point<u64>>
     let normal_vel = normalize_velocity(robot.velocity, dim);
     let next_pos = robot.pos + normal_vel * times;
 
-    Ok(Point {
-        x: next_pos.x % dim.width,
-        y: next_pos.y % dim.height,
-    })
+    Ok(Point::new(next_pos.x % dim.width, next_pos.y % dim.height))
 }
 
 fn normalize_velocity(velocity: Vec2<i32>, dim: Dimensions) -> Vec2<u64> {
-    Vec2 {
-        x: normalize_value(velocity.x, dim.width),
-        y: normalize_value(velocity.y, dim.height),
-    }
+    Vec2::new(
+        normalize_value(velocity.x, dim.width),
+        normalize_value(velocity.y, dim.height),
+    )
 }
 
 fn normalize_value(value: i32, identity: u64) -> u64 {
@@ -136,7 +77,7 @@ mod tests {
     fn robots_move_with_wrapping() {
         let robot = Robot {
             pos: Point { x: 2, y: 4 },
-            velocity: Vec2 { x: 2, y: -3 },
+            velocity: Vec2::new(2, -3),
         };
         let dim = Dimensions {
             height: 7,

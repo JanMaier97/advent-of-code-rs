@@ -3,6 +3,7 @@ use std::{collections::HashMap, error::Error};
 use linkme::distributed_slice;
 
 mod cli;
+pub mod common;
 mod year_2022;
 pub mod year_2023;
 mod year_2024;

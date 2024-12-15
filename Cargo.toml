@@ -20,6 +20,7 @@ rayon = { version = "=1.8" }
 linkme = "0.3"
 clap = { version = "4.5.21", features = ["derive"] }
 trycmd = "0.15.8"
+anyhow = "1.0.94"
 
 [[bench]]
 name = "2023_day_05"

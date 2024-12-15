@@ -24,8 +24,8 @@ fn solve_with_input(input: &str, dim: Dimensions, times: u64) -> MyResult<u64> {
 }
 
 fn count_positions(poinst: &[Point<u64>], dim: Dimensions) -> usize {
-    let middle_x = dim.width / 2;
-    let middle_y = dim.height / 2;
+    let middle_x: u64 = dim.width / 2;
+    let middle_y: u64 = dim.height / 2;
 
     let top_left = poinst
         .iter()
