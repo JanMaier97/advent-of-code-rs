@@ -7,11 +7,12 @@ use anyhow::{bail, Result};
 use itertools::Itertools;
 
 mod part_1;
+mod part_2;
 
 const INPUT: &str = include_str!("input.txt");
 
-struct Map {
-    grid: Grid<Tile>,
+struct Map<T> {
+    grid: Grid<T>,
     robot_pos: Point<i32>,
     directions: Vec<Vec2<i32>>,
 }
@@ -36,7 +37,7 @@ impl Tile {
     }
 }
 
-fn parse_input(input: &str) -> Result<Map> {
+fn parse_input(input: &str) -> Result<Map<Tile>> {
     let blocks = input.split("\r\n\r\n").collect_vec();
 
     if blocks.len() != 2 {
@@ -47,7 +48,7 @@ fn parse_input(input: &str) -> Result<Map> {
     }
 
     let grid = parse_grid(blocks[0], Tile::try_from_char)?;
-    let find_robot_position = find_robot_position(&grid);
+    let find_robot_position = find_tile_position(&grid, Tile::Robot);
     let pos = find_robot_position?;
     let directions = parse_directions(blocks[1])?;
 
@@ -58,16 +59,19 @@ fn parse_input(input: &str) -> Result<Map> {
     })
 }
 
-fn find_robot_position(grid: &Grid<Tile>) -> Result<Point<i32>> {
+fn find_tile_position<T>(grid: &Grid<T>, target_tile: T) -> Result<Point<i32>>
+where
+    T: PartialEq,
+{
     for row in 0..grid.dim().height {
         for col in 0..grid.dim().width {
-            let point = Point::new(row, col);
+            let point = Point::new(col, row);
 
             let Some(tile) = grid.get_at(point) else {
                 continue;
             };
 
-            if *tile == Tile::Robot {
+            if *tile == target_tile {
                 let x = col.try_into()?;
                 let y = row.try_into()?;
                 return Ok(Point::new(x, y));
@@ -102,7 +106,37 @@ fn parse_directions(input: &str) -> Result<Vec<Vec2<i32>>> {
     Ok(values)
 }
 
-fn find_box_positions(grid: &Grid<Tile>) -> Vec<Point<i32>> {
+fn print_grid<T, F>(grid: &Grid<T>, map_item: F)
+where
+    F: Fn(&T) -> char,
+{
+    let dim = grid.dim();
+    for y in 0..dim.height {
+        for x in 0..dim.width {
+            let point = Point::new(x, y);
+            let tile = grid.get_at(point).unwrap();
+            let char = map_item(tile);
+            print!("{}", char);
+        }
+
+        println!()
+    }
+}
+
+#[allow(dead_code)]
+fn map_tile(tile: &Tile) -> char {
+    match tile {
+        Tile::Box => 'O',
+        Tile::Empty => '.',
+        Tile::Wall => '#',
+        Tile::Robot => '@',
+    }
+}
+
+fn find_box_positions<T, F>(grid: &Grid<T>, is_box: F) -> Vec<Point<i32>>
+where
+    F: Fn(&T) -> bool,
+{
     let dim = grid.dim();
     let mut points = Vec::new();
 
@@ -116,7 +150,7 @@ fn find_box_positions(grid: &Grid<Tile>) -> Vec<Point<i32>> {
                 continue;
             };
 
-            if *tile == Tile::Box {
+            if is_box(tile) {
                 points.push(point);
             }
         }

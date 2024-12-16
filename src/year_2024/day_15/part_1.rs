@@ -13,13 +13,13 @@ fn solve(input: &str) -> MyResult<u64> {
 
     apply_movement(&mut map);
 
-    let points = find_box_positions(&map.grid);
+    let points = find_box_positions(&map.grid, |tile| *tile == Tile::Box);
     let sum = points.iter().map(|point| get_score_gps(*point)).sum();
 
     Ok(sum)
 }
 
-fn apply_movement(map: &mut Map) {
+fn apply_movement(map: &mut Map<Tile>) {
     for dir in map.directions.iter() {
         let Some(mut free_tile) = find_free_space_in_direction(&map.grid, map.robot_pos, *dir)
         else {
@@ -54,25 +54,6 @@ fn find_free_space_in_direction(
             Tile::Box => continue,
             Tile::Robot => continue,
         }
-    }
-}
-
-fn print_grid(grid: &Grid<Tile>) {
-    let dim = grid.dim();
-    for y in 0..dim.height {
-        for x in 0..dim.width {
-            let point = Point::new(x, y);
-            let tile = grid.get_at(point).unwrap();
-            let char = match tile {
-                Tile::Box => 'O',
-                Tile::Empty => '.',
-                Tile::Wall => '#',
-                Tile::Robot => '@',
-            };
-            print!("{}", char);
-        }
-
-        println!()
     }
 }
 

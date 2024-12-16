@@ -8,7 +8,7 @@ pub struct Grid<T> {
 }
 
 impl<T> Grid<T> {
-    pub(in crate::common) fn from_raw_values(values: Vec<Vec<T>>) -> Result<Self> {
+    pub fn from_raw_values(values: Vec<Vec<T>>) -> Result<Self> {
         let dim = Dimensions::from_grid(&values)?;
         Ok(Self { values, dim })
     }
