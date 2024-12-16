@@ -90,7 +90,7 @@ fn get_vertical_points_to_move(
         DoubleTile::RightBox => 
             get_vertical_points_to_move_for_box(
                 point_to_move,
-                point_in_front + Vec2::left(),
+                point_in_front + Vec2::LEFT,
                 grid,
                 direction,
             ),
@@ -109,7 +109,7 @@ fn get_vertical_points_to_move_for_box(
         return Vec::new();
     }
 
-    let right_box_position = left_box_position + Vec2::right();
+    let right_box_position = left_box_position + Vec2::RIGHT;
     let right_side = get_vertical_points_to_move(right_box_position, grid, direction);
     if right_side.is_empty() {
         return Vec::new();

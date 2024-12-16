@@ -16,6 +16,27 @@ impl<T> Grid<T> {
     pub fn dim(&self) -> Dimensions {
         self.dim
     }
+
+}
+
+impl<T: PartialEq> Grid<T> {
+    pub fn find_tile_position(&self, target_tile: T) -> Option<Point<i32>> {
+        for row in 0..self.dim().height {
+            for col in 0..self.dim().width {
+                let point = Point::new(col, row);
+
+                let tile = self.get_at(point).unwrap();
+
+                if *tile == target_tile {
+                    let x = col.try_into().unwrap();
+                    let y = row.try_into().unwrap();
+                    return Some(Point::new(x, y));
+                }
+            }
+        }
+
+        None
+    }
 }
 
 pub trait PointIdx<T> {
@@ -124,3 +145,4 @@ impl Dimensions {
         Ok(Dimensions::new(values.len().try_into()?, width.try_into()?))
     }
 }
+

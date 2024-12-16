@@ -88,10 +88,10 @@ fn parse_directions(input: &str) -> Result<Vec<Vec2<i32>>> {
     for (row_idx, row) in input.lines().enumerate() {
         for (col_idx, char) in row.chars().enumerate() {
             let dir = match char {
-                '>' => Vec2::right(),
-                '<' => Vec2::left(),
-                '^' => Vec2::up(),
-                'v' => Vec2::down(),
+                '>' => Vec2::RIGHT,
+                '<' => Vec2::LEFT,
+                '^' => Vec2::UP,
+                'v' => Vec2::DOWN,
                 _ => bail!(
                     "Invalid direction '{}' in row {} column {}",
                     char,

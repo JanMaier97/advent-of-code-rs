@@ -13,21 +13,10 @@ impl<T> Vec2<T> {
 }
 
 impl Vec2<i32> {
-    pub const fn up() -> Self {
-        Self { x: 0, y: -1 }
-    }
-
-    pub const fn down() -> Self {
-        Self { x: 0, y: 1 }
-    }
-
-    pub const fn left() -> Self {
-        Self { x: -1, y: 0 }
-    }
-
-    pub const fn right() -> Self {
-        Self { x: 1, y: 0 }
-    }
+    pub const UP: Vec2<i32> = Self { x: 0, y: -1 };
+    pub const DOWN: Vec2<i32> = Self { x: 0, y: 1 };
+    pub const LEFT:  Vec2<i32> = Self { x: -1, y: 0 };
+    pub const RIGHT:  Vec2<i32> = Self { x: 1, y: 0 };
 }
 
 impl<T: Add<Output = T>> Add for Vec2<T> {
