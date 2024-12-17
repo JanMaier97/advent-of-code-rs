@@ -1,10 +1,10 @@
 use macros::aoc_solver;
 use num::range_step;
 
-use crate::MyResult;
+use anyhow::Result;
 
 #[aoc_solver(2024, 4, 1, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let input = super::parse_input(input);
 
     let mut sum = 0;
@@ -16,7 +16,7 @@ fn solve(input: &str) -> MyResult<u64> {
         }
     }
 
-    Ok(sum.into())
+    Ok(sum.to_string())
 }
 
 fn count2(row: usize, col: usize, input: &[Vec<char>]) -> u32 {
@@ -111,7 +111,7 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(EXAMPLE).unwrap();
-        assert_eq!(result, 18);
+        assert_eq!(result, "18");
     }
 
     #[test]

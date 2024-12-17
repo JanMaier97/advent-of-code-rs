@@ -84,7 +84,7 @@ fn print_challenge_header(day: usize) {
     println!();
 }
 
-type SolverFunc = fn(&str) -> MyResult<u64>;
+type SolverFunc = fn(&str) -> anyhow::Result<String>;
 
 #[derive(Hash, Eq, PartialEq)]
 struct SolverDate {

@@ -2,7 +2,7 @@ use macros::aoc_solver;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::MyResult;
+use anyhow::{bail, Result};
 
 const DO_NOT_PATTERN: &str = r"don't\(\)";
 const DO_PATTERN: &str = r"do\(\)";
@@ -15,7 +15,7 @@ enum Operator {
 }
 
 #[aoc_solver(2024, 3, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let operators = parse_input(input)?;
 
     let mut sum = 0;
@@ -32,10 +32,10 @@ fn solve(input: &str) -> MyResult<u64> {
         }
     }
 
-    Ok(sum.into())
+    Ok(sum.to_string())
 }
 
-fn parse_input(input: &str) -> MyResult<Vec<Operator>> {
+fn parse_input(input: &str) -> Result<Vec<Operator>> {
     let literal_regex =
         Regex::new(format!("{DO_PATTERN}|{DO_NOT_PATTERN}|{MULTIPLY_PATTERN}").as_str())?;
     let mut operators = Vec::new();
@@ -53,7 +53,7 @@ fn parse_input(input: &str) -> MyResult<Vec<Operator>> {
     Ok(operators)
 }
 
-fn parse_literal(literal: &str) -> MyResult<Operator> {
+fn parse_literal(literal: &str) -> Result<Operator> {
     static DO_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(DO_PATTERN).unwrap());
     static DO_NOT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(DO_NOT_PATTERN).unwrap());
 
@@ -68,11 +68,11 @@ fn parse_literal(literal: &str) -> MyResult<Operator> {
     parse_multiplier(literal)
 }
 
-fn parse_multiplier(literal: &str) -> MyResult<Operator> {
+fn parse_multiplier(literal: &str) -> Result<Operator> {
     static MULT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(MULTIPLY_PATTERN).unwrap());
 
     let Some(capture) = MULT_REGEX.captures(literal) else {
-        return Err(format!("Found Invalid operand: '{}'", literal).into());
+        bail!("Found Invalid operand: '{}'", literal);
     };
 
     let (_, [op1, op2]) = capture.extract();
@@ -90,6 +90,6 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(EXAMPLE).unwrap();
-        assert_eq!(result, 48);
+        assert_eq!(result, "48");
     }
 }

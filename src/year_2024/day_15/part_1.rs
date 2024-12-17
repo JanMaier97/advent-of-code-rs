@@ -1,22 +1,21 @@
 use macros::aoc_solver;
 
-use crate::{
-    common::math_2d::{Grid, Point, PointIdx, Vec2},
-    MyResult,
-};
+use crate::common::math_2d::{Grid, Point, PointIdx, Vec2};
 
 use super::{find_box_positions, get_score_gps, parse_input, Map, Tile};
 
+use anyhow::Result;
+
 #[aoc_solver(2024, 15, 1, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let mut map = parse_input(input)?;
 
     apply_movement(&mut map);
 
     let points = find_box_positions(&map.grid, |tile| *tile == Tile::Box);
-    let sum = points.iter().map(|point| get_score_gps(*point)).sum();
+    let sum: u64 = points.iter().map(|point| get_score_gps(*point)).sum();
 
-    Ok(sum)
+    Ok(sum.to_string())
 }
 
 fn apply_movement(map: &mut Map<Tile>) {
@@ -62,12 +61,12 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 10092);
+        assert_eq!(result, "10092");
     }
 
     #[test]
     fn solve_small_example() {
         let result = super::solve(include_str!("small_example.txt")).unwrap();
-        assert_eq!(result, 2028);
+        assert_eq!(result, "2028");
     }
 }

@@ -1,11 +1,11 @@
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::{collect_areas, count_open_sides, parse_map, Area, Map};
 
 #[aoc_solver(2024, 12, 1, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let map = parse_map(input);
     let areas = collect_areas(&map)?;
 
@@ -14,7 +14,7 @@ fn solve(input: &str) -> MyResult<u64> {
         .flat_map(|(_, areas)| areas.iter().map(|a| get_perimeter(a, &map) * a.size()))
         .sum();
 
-    Ok(sum.try_into()?)
+    Ok(sum.to_string())
 }
 
 fn get_perimeter(area: &Area, map: &Map) -> usize {
@@ -31,30 +31,30 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 1930);
+        assert_eq!(result, "1930");
     }
 
     #[test]
     fn solve_small_example() {
         let input = "AAAA\nBBCD\nBBCC\nEEEC";
         let result = super::solve(input).unwrap();
-        assert_eq!(result, 140);
+        assert_eq!(result, "140");
     }
 
     #[test]
     fn solve_example_with_multiple_small_areas() {
         let input = "OOOOO\nOXOXO\nOOOOO\nOXOXO\nOOOOO";
         let result = super::solve(input).unwrap();
-        assert_eq!(result, 720);
+        assert_eq!(result, "772");
     }
 
     #[test]
     fn small_test() {
         let res = super::solve("A").unwrap();
-        assert_eq!(res, 4);
+        assert_eq!(res, "4");
 
         let res = super::solve("AA").unwrap();
-        assert_eq!(res, 12);
+        assert_eq!(res, "12");
     }
 
     #[test]

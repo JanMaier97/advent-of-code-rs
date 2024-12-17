@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
 
-use crate::MyResult;
+use anyhow::{bail, Result};
 
 mod part_1;
 mod part_2;
@@ -29,12 +29,12 @@ struct PrintJob {
     pages: Vec<Page>,
 }
 
-fn parse_input(input: &str) -> MyResult<PrintData> {
+fn parse_input(input: &str) -> Result<PrintData> {
     // TODO: find something better
     let parts = input.split("\r\n\r\n").collect_vec();
 
     if parts.len() != 2 {
-        return Err("Invalid input: Expected 2 parts".into());
+        bail!("Invalid input: Expected 2 parts");
     }
 
     let data = PrintData {
@@ -45,14 +45,14 @@ fn parse_input(input: &str) -> MyResult<PrintData> {
     Ok(data)
 }
 
-fn parse_print_jobs(input: &str) -> MyResult<Vec<PrintJob>> {
+fn parse_print_jobs(input: &str) -> Result<Vec<PrintJob>> {
     input
         .lines()
         .map(parse_print_job)
         .collect::<Result<Vec<_>, _>>()
 }
 
-fn parse_print_job(line: &str) -> MyResult<PrintJob> {
+fn parse_print_job(line: &str) -> Result<PrintJob> {
     let pages = line
         .split(',')
         .map(|p| p.parse::<u32>().map(Page))
@@ -62,7 +62,7 @@ fn parse_print_job(line: &str) -> MyResult<PrintJob> {
     Ok(job)
 }
 
-fn parse_order_rules(input: &str) -> MyResult<PageRules> {
+fn parse_order_rules(input: &str) -> Result<PageRules> {
     let mut result: HashMap<Page, Ordering> = HashMap::new();
 
     for line in input.lines() {
@@ -72,7 +72,7 @@ fn parse_order_rules(input: &str) -> MyResult<PageRules> {
             .collect::<Result<Vec<_>, _>>()?;
 
         if pages.len() != 2 {
-            return Err("Invalid input: found invalid rule".into());
+            bail!("Invalid input: found invalid rule");
         }
 
         result

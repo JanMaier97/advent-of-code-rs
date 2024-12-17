@@ -1,13 +1,13 @@
 use itertools::Itertools;
 
-use crate::MyResult;
+use anyhow::Result;
 
 mod part_1;
 mod part_2;
 
 const INPUT: &str = include_str!("input.txt");
 
-fn parse_input(input: &str) -> MyResult<Vec<u64>> {
+fn parse_input(input: &str) -> Result<Vec<u64>> {
     let res = input
         .split(' ')
         .map(|part| part.parse::<u64>())

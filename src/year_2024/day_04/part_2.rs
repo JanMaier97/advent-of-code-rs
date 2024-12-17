@@ -1,9 +1,9 @@
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 #[aoc_solver(2024, 4, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let input = super::parse_input(input);
     let mut sum = 0;
 
@@ -15,7 +15,7 @@ fn solve(input: &str) -> MyResult<u64> {
         }
     }
 
-    Ok(sum)
+    Ok(sum.to_string())
 }
 
 fn is_xmas_cross(row: usize, col: usize, input: &[Vec<char>]) -> bool {
@@ -60,6 +60,6 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 9);
+        assert_eq!(result, "9");
     }
 }

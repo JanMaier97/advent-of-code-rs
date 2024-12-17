@@ -1,4 +1,4 @@
-use crate::MyResult;
+use anyhow::{bail, Result};
 
 mod part_1;
 mod part_2;
@@ -10,7 +10,7 @@ struct ParsedLocation {
     list2: Vec<u32>,
 }
 
-fn parse_input(input: &str) -> MyResult<ParsedLocation> {
+fn parse_input(input: &str) -> Result<ParsedLocation> {
     let mut list1 = Vec::new();
     let mut list2 = Vec::new();
 
@@ -21,7 +21,7 @@ fn parse_input(input: &str) -> MyResult<ParsedLocation> {
             .collect::<Result<Vec<_>, _>>()?;
 
         if split.len() != 2 {
-            return Err(format!("Invalid input at line {}", idx + 1).into());
+            bail!("Invalid input at line {}", idx + 1);
         }
 
         list1.push(split[0]);

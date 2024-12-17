@@ -1,11 +1,11 @@
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::{anyhow, bail, Result};
 
 use super::{Block, BlockType};
 
 #[aoc_solver(2024, 9, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let mut blocks = parse_input(input)?;
     defragment_disk(&mut blocks);
 
@@ -20,9 +20,7 @@ fn solve(input: &str) -> MyResult<u64> {
         .map(|(idx, file_id)| idx * file_id)
         .sum();
 
-    let sum = u64::try_from(sum)?;
-
-    Ok(sum)
+    Ok(sum.to_string())
 }
 
 fn defragment_disk(blocks: &mut Vec<Block>) {
@@ -68,15 +66,15 @@ fn defragment_disk(blocks: &mut Vec<Block>) {
     }
 }
 
-fn parse_input(input: &str) -> MyResult<Vec<Block>> {
+fn parse_input(input: &str) -> Result<Vec<Block>> {
     if input.lines().count() != 1 {
-        return Err("Input must be only 1 line".into());
+        bail!("Input must be only 1 line");
     }
 
     let mut blocks = Vec::new();
 
     for (idx, c) in input.chars().enumerate() {
-        let size = c.to_digit(10).ok_or("Not a number")?;
+        let size = c.to_digit(10).ok_or(anyhow!("Not a number"))?;
         let block_type: BlockType = if idx % 2 == 0 {
             BlockType::File(idx / 2)
         } else {
@@ -97,6 +95,6 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 2858);
+        assert_eq!(result, "2858");
     }
 }

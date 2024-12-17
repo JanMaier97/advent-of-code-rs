@@ -1,19 +1,19 @@
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::{get_next_positions, parse_input, Map, Position};
 
 #[aoc_solver(2024, 10, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let puzzle_input = parse_input(input)?;
-    let sum = puzzle_input
+    let sum: u64 = puzzle_input
         .start_positions
         .iter()
         .map(|pos| compute_rating(*pos, &puzzle_input.map))
         .sum();
 
-    Ok(sum)
+    Ok(sum.to_string())
 }
 
 fn compute_rating(start_position: Position, map: &Map) -> u64 {
@@ -37,6 +37,6 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 81);
+        assert_eq!(result, "81");
     }
 }

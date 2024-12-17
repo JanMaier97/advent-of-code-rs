@@ -2,17 +2,17 @@ use std::collections::HashSet;
 
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::{determine_guard_path, parse_input, Direction, Guard, Map, Point};
 
 #[aoc_solver(2024, 6, 1, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let (map, guard) = parse_input(input)?;
     let positions = compute_guard_positions(guard, &map);
 
     let res = u64::try_from(positions.len())?;
-    Ok(res)
+    Ok(res.to_string())
 }
 
 fn compute_guard_positions(guard: Guard, map: &Map) -> HashSet<Point> {
@@ -56,6 +56,6 @@ mod tests {
     #[test]
     fn solve_exampe() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 41);
+        assert_eq!(result, "41");
     }
 }

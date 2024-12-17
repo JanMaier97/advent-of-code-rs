@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use itertools::Itertools;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
-use crate::MyResult;
+use anyhow::{bail, Result};
 
 mod part_1;
 mod part_2;
@@ -22,7 +22,7 @@ struct Equation {
     result: u64,
 }
 
-fn compute_solution(input: &str, operators: &[Operator]) -> MyResult<u64> {
+fn compute_solution(input: &str, operators: &[Operator]) -> Result<String> {
     let equations = parse_input(input)?;
 
     let result: u64 = equations
@@ -31,10 +31,10 @@ fn compute_solution(input: &str, operators: &[Operator]) -> MyResult<u64> {
         .map(|eq| eq.result)
         .sum();
 
-    Ok(result)
+    Ok(result.to_string())
 }
 
-fn is_equation_valid(equation: &Equation, operators: &[Operator]) -> MyResult<bool> {
+fn is_equation_valid(equation: &Equation, operators: &[Operator]) -> Result<bool> {
     let operator_permutations: HashSet<Vec<Operator>> =
         generate_operand_permutations(operators, equation.operands.len() - 1);
 
@@ -53,9 +53,9 @@ fn is_equation_valid(equation: &Equation, operators: &[Operator]) -> MyResult<bo
     Ok(false)
 }
 
-fn compute_result(operands: &[u64], operators: &[Operator]) -> MyResult<u64> {
+fn compute_result(operands: &[u64], operators: &[Operator]) -> Result<u64> {
     if operands.len() != operators.len() + 1 {
-        return Err("Invalid amount of operators for the number of operands".into());
+        bail!("Invalid amount of operators for the number of operands");
     }
 
     let mut result = operands[0];
@@ -95,14 +95,14 @@ fn generate_operand_permutations(operators: &[Operator], count: usize) -> HashSe
     permutations
 }
 
-fn parse_input(input: &str) -> MyResult<Vec<Equation>> {
+fn parse_input(input: &str) -> Result<Vec<Equation>> {
     input.lines().map(parse_equation).try_collect()
 }
 
-fn parse_equation(line: &str) -> MyResult<Equation> {
+fn parse_equation(line: &str) -> Result<Equation> {
     let split: Vec<&str> = line.split(": ").collect();
     if split.len() != 2 {
-        return Err(format!("Invalid equation: {}", line).into());
+        bail!("Invalid equation: {}", line);
     }
 
     let result: u64 = split[0].parse()?;

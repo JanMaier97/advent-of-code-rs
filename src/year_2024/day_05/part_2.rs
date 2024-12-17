@@ -1,11 +1,11 @@
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::{is_job_correct, parse_input, Page, PageRules, PrintJob};
 
 #[aoc_solver(2024, 5, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let data = parse_input(input)?;
     let result: u32 = data
         .jobs
@@ -14,7 +14,7 @@ fn solve(input: &str) -> MyResult<u64> {
         .map(|job| correct_job(job, &data.rules))
         .map(|pages| pages[pages.len() / 2].0)
         .sum();
-    Ok(result.into())
+    Ok(result.to_string())
 }
 
 fn correct_job(job: &PrintJob, rules: &PageRules) -> Vec<Page> {
@@ -63,6 +63,6 @@ mod tests {
     #[test]
     fn solve_exampe() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 123);
+        assert_eq!(result, "123");
     }
 }

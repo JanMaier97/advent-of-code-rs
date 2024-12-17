@@ -2,14 +2,14 @@ use std::collections::HashSet;
 
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::{get_next_positions, parse_input, Map, Position};
 
 #[aoc_solver(2024, 10, 1, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let puzzle_input = parse_input(input)?;
-    let total_score = puzzle_input
+    let total_score: u64 = puzzle_input
         .start_positions
         .iter()
         .map(|pos| score_trail(*pos, &puzzle_input.map))
@@ -17,14 +17,14 @@ fn solve(input: &str) -> MyResult<u64> {
         .iter()
         .sum();
 
-    Ok(total_score)
+    Ok(total_score.to_string())
 }
 
-fn score_trail(start_position: Position, map: &Map) -> MyResult<u64> {
+fn score_trail(start_position: Position, map: &Map) -> Result<u64> {
     score_recursively(HashSet::from([start_position]), map)
 }
 
-fn score_recursively(positions: HashSet<Position>, map: &Map) -> MyResult<u64> {
+fn score_recursively(positions: HashSet<Position>, map: &Map) -> Result<u64> {
     if positions.is_empty() {
         return Ok(0);
     }
@@ -49,6 +49,6 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 36);
+        assert_eq!(result, "36");
     }
 }

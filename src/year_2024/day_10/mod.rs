@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::MyResult;
+use anyhow::Result;
 
 mod part_1;
 mod part_2;
@@ -58,7 +58,7 @@ fn get_next_positions(pos: Position, map: &Map) -> HashSet<Position> {
     positions
 }
 
-fn parse_input(input: &str) -> MyResult<PuzzleInput> {
+fn parse_input(input: &str) -> Result<PuzzleInput> {
     let mut grid = Vec::new();
     let mut start_positions = HashSet::new();
     for (line_idx, line) in input.lines().enumerate() {

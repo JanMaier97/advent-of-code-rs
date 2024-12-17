@@ -1,4 +1,4 @@
-use crate::MyResult;
+use anyhow::Result;
 
 mod part_1;
 mod part_2;
@@ -16,7 +16,7 @@ enum Safety {
     Unsave,
 }
 
-fn parse_input(input: &str) -> MyResult<Vec<Record>> {
+fn parse_input(input: &str) -> Result<Vec<Record>> {
     let mut records = Vec::new();
     for line in input.lines() {
         let levels = line
@@ -40,11 +40,11 @@ fn count_save_records(records: &[Record], safety_strategy: fn(&Record) -> Safety
     count as u32
 }
 
-fn parse_and_count(input: &str, safety_strategy: fn(&Record) -> Safety) -> MyResult<u64> {
+fn parse_and_count(input: &str, safety_strategy: fn(&Record) -> Safety) -> Result<String> {
     let records = parse_input(input)?;
     let count = count_save_records(&records, safety_strategy);
 
-    Ok(count.into())
+    Ok(count.to_string())
 }
 
 fn all_levels_safe(record: &Record) -> Safety {

@@ -2,16 +2,16 @@ use std::collections::HashSet;
 
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::{determine_guard_path, parse_input, Direction, Guard, Map, Point};
 
 #[aoc_solver(2024, 6, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let (map, guard) = parse_input(input)?;
     let positions = generate_loop_possitions(guard, &map);
     let result = u64::try_from(positions.len())?;
-    Ok(result)
+    Ok(result.to_string())
 }
 
 fn generate_loop_possitions(guard: Guard, map: &Map) -> HashSet<Point> {
@@ -90,7 +90,7 @@ mod tests {
     #[test]
     fn solve_exampe() {
         let result = super::solve(EXAMPLE).unwrap();
-        assert_eq!(result, 6);
+        assert_eq!(result, "6");
     }
 
     #[test]

@@ -4,7 +4,6 @@ use macros::aoc_solver;
 use crate::{
     common::math_2d::{Grid, Point, PointIdx, Vec2},
     year_2024::day_15::{find_tile_position, parse_input, Map},
-    MyResult,
 };
 
 use super::{find_box_positions, get_score_gps, print_grid, Tile};
@@ -21,7 +20,7 @@ enum DoubleTile {
 }
 
 #[aoc_solver(2024, 15, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let map = parse_input(input)?;
     let grid = enlarge_map(&map.grid)?;
     let mut map = Map {
@@ -33,12 +32,12 @@ fn solve(input: &str) -> MyResult<u64> {
     apply_movement(&mut map);
 
     let points = find_box_positions(&map.grid, |&tile| tile == DoubleTile::LeftBox);
-    let sum = points.iter().map(|p| get_score_gps(*p)).sum();
-    Ok(sum)
+    let sum: u64 = points.iter().map(|p| get_score_gps(*p)).sum();
+    Ok(sum.to_string())
 }
 
 fn apply_movement(map: &mut Map<DoubleTile>) {
-    for (iteration, dir) in map.directions.iter().cloned().enumerate() {
+    for (_, dir) in map.directions.iter().cloned().enumerate() {
         let points_to_move = get_points_to_move(map.robot_pos, &map.grid, dir);
         for point in points_to_move.iter().cloned() {
             let tile_to_move = *map.grid.get_at(point).unwrap();
@@ -196,12 +195,12 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 9021);
+        assert_eq!(result, "9021");
     }
 
     #[test]
     fn solve_small_example_2() {
         let result = super::solve(include_str!("small_example_2.txt")).unwrap();
-        assert_eq!(result, 618);
+        assert_eq!(result, "618");
     }
 }

@@ -4,12 +4,9 @@ use anyhow::{anyhow, bail, Result};
 use itertools::Itertools;
 use macros::aoc_solver;
 
-use crate::{
-    common::{
-        math_2d::{Grid, Point, PointIdx, Vec2},
-        parsing::parse_grid,
-    },
-    MyResult,
+use crate::common::{
+    math_2d::{Grid, Point, PointIdx, Vec2},
+    parsing::parse_grid,
 };
 
 type RaceResult = (u64, HashMap<(Point<i32>, Vec2<i32>), u64>);
@@ -20,7 +17,6 @@ struct NextPoint {
     dir: Vec2<i32>,
     cost: u64,
 }
-
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Tile {
@@ -36,7 +32,7 @@ struct Map {
 }
 
 #[aoc_solver(2024, 16, 1, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let map = parse_input(input)?;
 
     let (base_cost, visited) = find_cost_for_shortest_path(&map.grid, map.start_pos);
@@ -48,11 +44,11 @@ fn solve(input: &str) -> MyResult<u64> {
         0,
         base_cost,
     );
-    Ok(score)
+    Ok(score.to_string())
 }
 
 #[aoc_solver(2024, 16, 2, super::INPUT)]
-fn solve_part_2(input: &str) -> MyResult<u64> {
+fn solve_part_2(input: &str) -> Result<String> {
     let map = parse_input(input)?;
 
     let (base_cost, visited) = find_cost_for_shortest_path(&map.grid, map.start_pos);
@@ -65,7 +61,7 @@ fn solve_part_2(input: &str) -> MyResult<u64> {
         base_cost,
     );
 
-    Ok(path.len().try_into()?)
+    Ok(path.len().to_string())
 }
 
 fn parse_input(input: &str) -> Result<Map> {
@@ -126,7 +122,7 @@ fn find_lowest_cost(
             found_an_end = true;
         }
 
-        if next_cost  <= best_cost {
+        if next_cost <= best_cost {
             path_points.extend(next_paths);
             path_points.insert(current_pos);
         }
@@ -226,10 +222,7 @@ fn print_map(grid: &Grid<Tile>, pos: Point<i32>, path: &HashSet<Point<i32>>) {
     }
 }
 
-fn find_cost_for_shortest_path(
-    grid: &Grid<Tile>,
-    start_pos: Point<i32>,
-) -> RaceResult {
+fn find_cost_for_shortest_path(grid: &Grid<Tile>, start_pos: Point<i32>) -> RaceResult {
     let mut visited = HashMap::new();
     let to_visit = HashSet::from([NextPoint {
         pos: start_pos,
@@ -285,24 +278,24 @@ mod tests {
     #[test]
     fn solve_example_1() {
         let result = super::solve(include_str!("example_1.txt")).unwrap();
-        assert_eq!(result, 7036);
+        assert_eq!(result, "7036");
     }
 
     #[test]
     fn solve_example_2() {
         let result = super::solve(include_str!("example_2.txt")).unwrap();
-        assert_eq!(result, 11048);
+        assert_eq!(result, "11048");
     }
 
     #[test]
     fn solve_part_2_example_1() {
         let result = super::solve_part_2(include_str!("example_1.txt")).unwrap();
-        assert_eq!(result, 45);
+        assert_eq!(result, "45");
     }
 
     #[test]
     fn solve_part_2_example_2() {
         let result = super::solve_part_2(include_str!("example_2.txt")).unwrap();
-        assert_eq!(result, 64);
+        assert_eq!(result, "64");
     }
 }

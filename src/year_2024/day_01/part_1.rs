@@ -1,11 +1,11 @@
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::parse_input;
 
 #[aoc_solver(2024, 1, 1, super::INPUT)]
-pub fn solve(input: &str) -> MyResult<u64> {
+pub fn solve(input: &str) -> Result<String> {
     let mut locations = parse_input(input)?;
 
     locations.list1.sort();
@@ -18,7 +18,7 @@ pub fn solve(input: &str) -> MyResult<u64> {
         .map(|(loc1, loc2)| loc1.abs_diff(loc2))
         .sum();
 
-    Ok(result.into())
+    Ok(result.to_string())
 }
 
 #[cfg(test)]
@@ -31,6 +31,6 @@ mod tests {
     fn solve_example() {
         let result = solve(EXAMPLE_INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 11);
+        assert_eq!(result.unwrap(), "11");
     }
 }

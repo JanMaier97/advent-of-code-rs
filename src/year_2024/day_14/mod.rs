@@ -1,10 +1,9 @@
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::{
-    common::math_2d::{Dimensions, Point, Vec2},
-    MyResult,
-};
+use crate::common::math_2d::{Dimensions, Point, Vec2};
+
+use anyhow::{anyhow, Result};
 
 mod part_1;
 mod part_2;
@@ -17,25 +16,25 @@ struct Robot {
     velocity: Vec2<i32>,
 }
 
-fn parse_input(input: &str) -> MyResult<Vec<Robot>> {
+fn parse_input(input: &str) -> Result<Vec<Robot>> {
     input
         .lines()
         .map(parse_robot)
         .collect::<Result<Vec<_>, _>>()
 }
 
-fn parse_robot(line: &str) -> MyResult<Robot> {
+fn parse_robot(line: &str) -> Result<Robot> {
     static REGEX: Lazy<Regex> =
         Lazy::new(|| Regex::new(r"p=(\d+),(\d+) v=(-?\d+),(-?\d+)").unwrap());
 
-    let caputres = REGEX.captures(line).ok_or("Invalid line")?;
+    let caputres = REGEX.captures(line).ok_or(anyhow!("Invalid line"))?;
     let pos = Point::new(caputres[1].parse::<u64>()?, caputres[2].parse::<u64>()?);
     let vel = Vec2::new(caputres[3].parse::<i32>()?, caputres[4].parse::<i32>()?);
 
     Ok(Robot { pos, velocity: vel })
 }
 
-fn move_robot(robot: Robot, dim: Dimensions, times: u64) -> MyResult<Point<u64>> {
+fn move_robot(robot: Robot, dim: Dimensions, times: u64) -> Result<Point<u64>> {
     let normal_vel = normalize_velocity(robot.velocity, dim);
     let next_pos = robot.pos + normal_vel * times;
 

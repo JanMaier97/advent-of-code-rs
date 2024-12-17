@@ -1,6 +1,6 @@
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -25,7 +25,7 @@ struct Game {
 }
 
 #[aoc_solver(2023, 2, 1, INPUT)]
-fn solve_part_one(input: &str) -> MyResult<u64> {
+fn solve_part_one(input: &str) -> Result<String> {
     let games = parse_input(input)?;
 
     let sum: u64 = games
@@ -35,11 +35,11 @@ fn solve_part_one(input: &str) -> MyResult<u64> {
         .sum::<usize>()
         .try_into()?;
 
-    return Ok(sum);
+    return Ok(sum.to_string());
 }
 
 #[aoc_solver(2023, 2, 2, INPUT)]
-fn solve_part_two(input: &str) -> MyResult<u64> {
+fn solve_part_two(input: &str) -> Result<String> {
     let games = parse_input(input)?;
     let mut total_power = 0;
 
@@ -51,7 +51,7 @@ fn solve_part_two(input: &str) -> MyResult<u64> {
         total_power += blue_power * green_power * red_power;
     }
 
-    return Ok(total_power.try_into()?);
+    return Ok(total_power.to_string());
 }
 
 fn get_power_for_color(game: &Game, color: Color) -> usize {
@@ -80,7 +80,7 @@ fn game_is_possible(red_count: usize, green_count: usize, blue_count: usize, gam
     return true;
 }
 
-fn parse_input(input: &str) -> MyResult<Vec<Game>> {
+fn parse_input(input: &str) -> Result<Vec<Game>> {
     let mut games = Vec::new();
 
     for (line_index, line) in input.lines().enumerate() {
@@ -132,27 +132,27 @@ mod tests {
     fn example_part_one_correct() {
         let result = solve_part_one(EXAMPLE_INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 8);
+        assert_eq!(result.unwrap(), "8");
     }
 
     #[test]
     fn input_part_one_correct() {
         let result = solve_part_one(INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 2348);
+        assert_eq!(result.unwrap(), "2348");
     }
 
     #[test]
     fn example_part_two_correct() {
         let result = solve_part_two(EXAMPLE_INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 2286);
+        assert_eq!(result.unwrap(), "2286");
     }
 
     #[test]
     fn input_part_two_correct() {
         let result = solve_part_two(INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 76008);
+        assert_eq!(result.unwrap(), "76008");
     }
 }

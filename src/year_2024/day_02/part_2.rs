@@ -2,12 +2,12 @@ use std::collections::HashSet;
 
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::{all_levels_safe, parse_and_count, Record, Safety};
 
 #[aoc_solver(2024, 2, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     parse_and_count(input, with_problem_dampener)
 }
 
@@ -72,20 +72,20 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(EXAMPLE).unwrap();
-        assert_eq!(result, 4);
+        assert_eq!(result, "4");
     }
 
     #[test]
     fn last_level_is_unsafe() {
         let input = "1 2 3 8";
         let result = super::solve(input).unwrap();
-        assert_eq!(result, 1);
+        assert_eq!(result, "1");
     }
 
     #[test]
     fn direction_change_at_start() {
         let input = "4 2 3 4";
         let result = super::solve(input).unwrap();
-        assert_eq!(result, 1);
+        assert_eq!(result, "1");
     }
 }

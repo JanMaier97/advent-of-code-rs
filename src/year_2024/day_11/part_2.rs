@@ -2,13 +2,15 @@ use std::collections::HashMap;
 
 use macros::aoc_solver;
 
-use crate::{year_2024::day_11::parse_input, MyResult};
+use crate::year_2024::day_11::parse_input;
+
+use anyhow::Result;
 
 #[aoc_solver(2024, 11, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let values = parse_input(input)?;
     let count = blink(75, values);
-    Ok(count)
+    Ok(count.to_string())
 }
 
 fn blink(times: usize, values: Vec<u64>) -> u64 {
@@ -75,7 +77,7 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 65601038650482);
+        assert_eq!(result, "65601038650482");
     }
 
     #[test]

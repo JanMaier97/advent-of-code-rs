@@ -3,7 +3,7 @@ use std::{collections::HashSet, hash::Hash};
 use itertools::Itertools;
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::{collect_areas, parse_map, Area, Position};
 
@@ -14,7 +14,7 @@ struct CornerPoint {
 }
 
 #[aoc_solver(2024, 12, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let map = parse_map(input);
     let plants = collect_areas(&map)?;
 
@@ -23,7 +23,7 @@ fn solve(input: &str) -> MyResult<u64> {
         .flat_map(|(_, areas)| areas.iter().map(|a| count_corners_for_area(a) * a.size()))
         .sum();
 
-    Ok(sum.try_into()?)
+    Ok(sum.to_string())
 }
 
 fn count_corners_for_area(area: &Area) -> usize {
@@ -110,7 +110,7 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 1206);
+        assert_eq!(result, "1206");
     }
 
     #[test]
@@ -138,12 +138,12 @@ mod tests {
     #[test]
     fn solve_small() {
         let result = super::solve("EEEEE\nEXXXX\nEEEEE\nEXXXX\nEEEEE").unwrap();
-        assert_eq!(result, 236);
+        assert_eq!(result, "236");
     }
 
     #[test]
     fn solve_small_2() {
         let result = super::solve("AAAAAA\nAAABBA\nAAABBA\nABBAAA\nABBAAA\nAAAAAA").unwrap();
-        assert_eq!(result, 368);
+        assert_eq!(result, "368");
     }
 }

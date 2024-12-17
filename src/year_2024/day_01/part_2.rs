@@ -2,12 +2,12 @@ use std::collections::HashMap;
 
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::parse_input;
 
 #[aoc_solver(2024, 1, 2, super::INPUT)]
-pub fn solve(input: &str) -> MyResult<u64> {
+pub fn solve(input: &str) -> Result<String> {
     let locations = parse_input(input)?;
     let frequencies = get_frequencies(&locations.list2);
     let result: u32 = locations
@@ -15,7 +15,7 @@ pub fn solve(input: &str) -> MyResult<u64> {
         .into_iter()
         .map(|id| id * frequencies.get(&id).unwrap_or(&0))
         .sum();
-    Ok(result.into())
+    Ok(result.to_string())
 }
 
 fn get_frequencies(location_ids: &[u32]) -> HashMap<u32, u32> {
@@ -36,6 +36,6 @@ mod tests {
     fn solve_example() {
         let result = solve(EXAMPLE_INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 31);
+        assert_eq!(result.unwrap(), "31");
     }
 }

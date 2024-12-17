@@ -2,7 +2,7 @@ use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::MyResult;
+use anyhow::{anyhow, bail, Result};
 
 mod part_1;
 mod part_2;
@@ -22,15 +22,15 @@ struct Machine {
     price: Vec2,
 }
 
-fn solve_for_input(input: &str, offset: i64) -> MyResult<u64> {
+fn solve_for_input(input: &str, offset: i64) -> Result<String> {
     let machines = parse_input(input)?;
     let machines = machines
         .iter()
         .map(|m| apply_offset(*m, offset))
         .collect_vec();
-    let sum = machines.iter().map(|m| compute_required_token(*m)).sum();
+    let sum: u64 = machines.iter().map(|m| compute_required_token(*m)).sum();
 
-    Ok(sum)
+    Ok(sum.to_string())
 }
 
 fn apply_offset(machine: Machine, offset: i64) -> Machine {
@@ -44,17 +44,17 @@ fn apply_offset(machine: Machine, offset: i64) -> Machine {
     }
 }
 
-fn parse_input(input: &str) -> MyResult<Vec<Machine>> {
+fn parse_input(input: &str) -> Result<Vec<Machine>> {
     input
         .split("\r\n\r\n")
         .map(parse_machine)
         .collect::<Result<Vec<_>, _>>()
 }
 
-fn parse_machine(block: &str) -> MyResult<Machine> {
+fn parse_machine(block: &str) -> Result<Machine> {
     let lines = block.lines().collect_vec();
     if lines.len() != 3 {
-        return Err(format!("Invalid machine block:\n{}", block).into());
+        bail!("Invalid machine block:\n{}", block);
     }
 
     let machine = Machine {
@@ -66,9 +66,11 @@ fn parse_machine(block: &str) -> MyResult<Machine> {
     Ok(machine)
 }
 
-fn parse_price(line: &str) -> MyResult<Vec2> {
+fn parse_price(line: &str) -> Result<Vec2> {
     static PRICE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"Prize: X=(\d+), Y=(\d+)").unwrap());
-    let capture = PRICE_REGEX.captures(line).ok_or("Invalid a button input")?;
+    let capture = PRICE_REGEX
+        .captures(line)
+        .ok_or(anyhow!("Invalid a button input"))?;
     let price = Vec2 {
         x: capture[1].parse::<i64>()?,
         y: capture[2].parse::<i64>()?,
@@ -77,13 +79,13 @@ fn parse_price(line: &str) -> MyResult<Vec2> {
     Ok(price)
 }
 
-fn parse_button(line: &str) -> MyResult<Vec2> {
+fn parse_button(line: &str) -> Result<Vec2> {
     static BUTTON_REGEX: Lazy<Regex> =
         Lazy::new(|| Regex::new(r"Button [AB]: X\+(\d+), Y\+(\d+)").unwrap());
 
     let capture = BUTTON_REGEX
         .captures(line)
-        .ok_or("Invalid a button input")?;
+        .ok_or(anyhow!("Invalid a button input"))?;
     let btn = Vec2 {
         x: capture[1].parse::<i64>()?,
         y: capture[2].parse::<i64>()?,

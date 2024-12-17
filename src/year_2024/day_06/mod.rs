@@ -1,9 +1,9 @@
 use std::collections::HashSet;
 
-use crate::MyResult;
-
 mod part_1;
 mod part_2;
+
+use anyhow::Result;
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -93,7 +93,7 @@ fn determine_guard_path(guard: Guard, map: &Map) -> Vec<Point> {
     positions
 }
 
-fn parse_input(input: &str) -> MyResult<(Map, Guard)> {
+fn parse_input(input: &str) -> Result<(Map, Guard)> {
     let mut obstacle_positions = HashSet::new();
     let mut guard_pos: Option<Point> = None;
     let mut guard_dir: Option<Direction> = None;

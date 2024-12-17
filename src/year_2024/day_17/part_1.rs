@@ -1,12 +1,9 @@
+use anyhow::Result;
 use macros::aoc_solver;
 
-use anyhow::Result;
-
-use super::{compute_solution, Operator};
-
-#[aoc_solver(2024, 7, 1, super::INPUT)]
+#[aoc_solver(2024, 17, 1, super::INPUT)]
 fn solve(input: &str) -> Result<String> {
-    compute_solution(input, &[Operator::Add, Operator::Multiply])
+    unimplemented!()
 }
 
 #[cfg(test)]
@@ -14,6 +11,6 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, "3749");
+        assert_eq!(result, "4,6,3,5,6,3,5,2,1,0");
     }
 }

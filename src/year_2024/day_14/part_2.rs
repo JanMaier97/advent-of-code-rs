@@ -2,12 +2,12 @@ use std::{collections::HashSet, io::stdin};
 
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::Result;
 
 use super::{move_robot, parse_input, Dimensions, Point, Robot};
 
 #[aoc_solver(2024, 14, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let dim = Dimensions {
         height: 103,
         width: 101,
@@ -16,10 +16,10 @@ fn solve(input: &str) -> MyResult<u64> {
     let robots = parse_input(input)?;
     find_christmas_tree(&robots, dim)?;
 
-    Ok(0)
+    Ok(0.to_string())
 }
 
-fn find_christmas_tree(robots: &[Robot], dim: Dimensions) -> MyResult<()> {
+fn find_christmas_tree(robots: &[Robot], dim: Dimensions) -> Result<()> {
     for times in 0.. {
         if times % 1000 == 0 {
             println!("iteration {}", times);
@@ -43,7 +43,7 @@ fn get_robot_positions(
     robots: &[Robot],
     dim: Dimensions,
     times: u64,
-) -> MyResult<HashSet<Point<u64>>> {
+) -> Result<HashSet<Point<u64>>> {
     robots
         .iter()
         .map(|r| move_robot(*r, dim, times))
@@ -89,6 +89,7 @@ mod tests {
 
     #[test]
     fn test() {
+        // TODO: setup test
         let dim = Dimensions {
             width: 11,
             height: 7,

@@ -1,11 +1,13 @@
 use macros::aoc_solver;
 
-use crate::{year_2024::day_14::parse_input, MyResult};
+use crate::year_2024::day_14::parse_input;
 
 use super::{move_robot, Dimensions, Point};
 
+use anyhow::Result;
+
 #[aoc_solver(2024, 14, 1, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let dim = Dimensions {
         height: 103,
         width: 101,
@@ -13,14 +15,14 @@ fn solve(input: &str) -> MyResult<u64> {
     solve_with_input(input, dim, 100)
 }
 
-fn solve_with_input(input: &str, dim: Dimensions, times: u64) -> MyResult<u64> {
+fn solve_with_input(input: &str, dim: Dimensions, times: u64) -> Result<String> {
     let robots = parse_input(input)?;
     let points = robots
         .iter()
         .map(|r| move_robot(*r, dim, times))
         .collect::<Result<Vec<_>, _>>()?;
 
-    Ok(count_positions(&points, dim).try_into()?)
+    Ok(count_positions(&points, dim).to_string())
 }
 
 fn count_positions(poinst: &[Point<u64>], dim: Dimensions) -> usize {
@@ -58,7 +60,7 @@ mod tests {
             width: 11,
         };
         let result = super::solve_with_input(include_str!("example.txt"), dim, 100).unwrap();
-        assert_eq!(result, 12);
+        assert_eq!(result, "12");
     }
 
     #[test]
@@ -69,6 +71,6 @@ mod tests {
         };
         let input = "p=0,4 v=3,-3\np=0,0 v=0,0\np=0,6 v=0,0\np=10,0 v=0,0\np=10,6 v=0,0";
         let result = super::solve_with_input(input, dim, 5).unwrap();
-        assert_eq!(result, 1);
+        assert_eq!(result, "1");
     }
 }

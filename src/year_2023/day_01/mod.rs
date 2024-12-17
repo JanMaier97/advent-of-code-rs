@@ -2,7 +2,7 @@ use std::{cmp::max, collections::HashSet};
 
 use macros::aoc_solver;
 
-use crate::MyResult;
+use anyhow::{anyhow, Result};
 
 const INPUT: &str = include_str!("input.txt");
 const SPELLED_DIGIT: [&str; 9] = [
@@ -22,28 +22,28 @@ impl PartialEq for Digit {
 }
 
 #[aoc_solver(2023, 1, 1, INPUT)]
-fn solve_part_one(input: &str) -> MyResult<u64> {
+fn solve_part_one(input: &str) -> Result<String> {
     compute_value(input, find_raw_digits)
 }
 
 #[aoc_solver(2023, 1, 2, INPUT)]
-fn solve_part_two(input: &str) -> MyResult<u64> {
+fn solve_part_two(input: &str) -> Result<String> {
     compute_value(input, find_raw_and_spelled_digits)
 }
 
-fn compute_value<F>(input: &str, digit_finder: F) -> MyResult<u64>
+fn compute_value<F>(input: &str, digit_finder: F) -> Result<String>
 where
     F: Fn(&str) -> Vec<Digit>,
 {
-    let sum = input
+    let sum: u64 = input
         .lines()
         .map(|l| digit_finder(l))
         .map(|digits| compute_value_of_digits(&digits))
-        .collect::<MyResult<Vec<_>>>()?
+        .collect::<Result<Vec<_>>>()?
         .into_iter()
         .sum();
 
-    Ok(sum)
+    Ok(sum.to_string())
 }
 
 fn find_raw_and_spelled_digits(line: &str) -> Vec<Digit> {
@@ -55,9 +55,9 @@ fn find_raw_and_spelled_digits(line: &str) -> Vec<Digit> {
     digits
 }
 
-fn compute_value_of_digits(digits: &[Digit]) -> MyResult<u64> {
-    let first_digit = digits.first().ok_or("No digits found in line")?;
-    let last_digit = digits.last().ok_or("No digits found in line")?;
+fn compute_value_of_digits(digits: &[Digit]) -> Result<u64> {
+    let first_digit = digits.first().ok_or(anyhow!("No digits found in line"))?;
+    let last_digit = digits.last().ok_or(anyhow!("No digits found in line"))?;
 
     let value = first_digit.value * 10 + last_digit.value;
     Ok(value)
@@ -138,28 +138,28 @@ mod tests {
     fn test_part_one_example() {
         let result = solve_part_one(EXAMPLE_INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 142);
+        assert_eq!(result.unwrap(), "142");
     }
 
     #[test]
     fn test_part_one_input() {
         let result = solve_part_one(INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 54708);
+        assert_eq!(result.unwrap(), "54708");
     }
 
     #[test]
     fn test_part_two_example() {
         let result = solve_part_two(EXAMPLE_2_INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 281);
+        assert_eq!(result.unwrap(), "281");
     }
 
     #[test]
     fn test_part_two_input() {
         let result = solve_part_two(INPUT);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 54087);
+        assert_eq!(result.unwrap(), "54087");
     }
 
     #[test]

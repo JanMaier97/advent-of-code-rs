@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
 
-use crate::MyResult;
+use anyhow::Result;
 
 mod part_1;
 mod part_2;
@@ -62,7 +62,7 @@ fn count_open_sides(pos: Position, map: &Map) -> usize {
     4 - neighbour_count
 }
 
-fn collect_areas(map: &Map) -> MyResult<HashMap<char, Vec<Area>>> {
+fn collect_areas(map: &Map) -> Result<HashMap<char, Vec<Area>>> {
     let mut result: HashMap<char, Vec<Area>> = HashMap::new();
     for (row_idx, row) in map.grid.iter().enumerate() {
         for (col_idx, plant) in row.iter().enumerate() {

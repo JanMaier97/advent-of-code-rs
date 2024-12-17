@@ -2,12 +2,14 @@ use std::collections::HashSet;
 
 use macros::aoc_solver;
 
-use crate::{year_2024::day_08::parse_map, MyResult};
+use crate::year_2024::day_08::parse_map;
+
+use anyhow::Result;
 
 use super::{Dimensions, Point2, Vec2};
 
 #[aoc_solver(2024, 8, 2, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let map = parse_map(input)?;
     let count = map
         .frequencies
@@ -16,9 +18,7 @@ fn solve(input: &str) -> MyResult<u64> {
         .collect::<HashSet<_>>()
         .len();
 
-    let count = u64::try_from(count)?;
-
-    Ok(count)
+    Ok(count.to_string())
 }
 
 fn find_antinodes(frequency_origins: &HashSet<Point2>, dim: Dimensions) -> HashSet<Point2> {
@@ -65,6 +65,6 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, 34);
+        assert_eq!(result, "34");
     }
 }

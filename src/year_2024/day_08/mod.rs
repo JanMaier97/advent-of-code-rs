@@ -4,7 +4,7 @@ use std::{
     ops::{Add, Mul, Sub},
 };
 
-use crate::MyResult;
+use anyhow::{anyhow, Result};
 
 mod part_1;
 mod part_2;
@@ -92,13 +92,13 @@ impl Mul<i32> for Vec2 {
     }
 }
 
-fn parse_map(input: &str) -> MyResult<Map> {
+fn parse_map(input: &str) -> Result<Map> {
     let height = input.lines().count();
     let width = input
         .lines()
         .map(|line| line.len())
         .max()
-        .ok_or("Input is empyt")?;
+        .ok_or(anyhow!("Input is empyt"))?;
 
     let map = Map {
         frequencies: parse_freqency_nodes(input)?,
@@ -108,7 +108,7 @@ fn parse_map(input: &str) -> MyResult<Map> {
     Ok(map)
 }
 
-fn parse_freqency_nodes(input: &str) -> MyResult<HashMap<Frequency, HashSet<Point2>>> {
+fn parse_freqency_nodes(input: &str) -> Result<HashMap<Frequency, HashSet<Point2>>> {
     let mut frequencies = HashMap::new();
 
     for (y, line) in input.lines().enumerate() {

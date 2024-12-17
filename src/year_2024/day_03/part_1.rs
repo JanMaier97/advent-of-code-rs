@@ -1,18 +1,18 @@
 use macros::aoc_solver;
 use regex::Regex;
 
-use crate::MyResult;
+use anyhow::Result;
 
 #[aoc_solver(2024, 3, 1, super::INPUT)]
-fn solve(input: &str) -> MyResult<u64> {
+fn solve(input: &str) -> Result<String> {
     let multiplications = parse_input(input)?;
 
     let sum: u32 = multiplications.iter().map(|(op1, op2)| op1 * op2).sum();
 
-    Ok(sum.into())
+    Ok(sum.to_string())
 }
 
-fn parse_input(input: &str) -> MyResult<Vec<(u32, u32)>> {
+fn parse_input(input: &str) -> Result<Vec<(u32, u32)>> {
     let regex = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)")?;
     let mut operands = Vec::new();
 
@@ -29,7 +29,7 @@ fn parse_input(input: &str) -> MyResult<Vec<(u32, u32)>> {
     Ok(operands)
 }
 
-fn parse_operands(op1: &str, op2: &str) -> MyResult<(u32, u32)> {
+fn parse_operands(op1: &str, op2: &str) -> Result<(u32, u32)> {
     let op1 = op1.parse::<u32>()?;
     let op2 = op2.parse::<u32>()?;
     Ok((op1, op2))
@@ -42,6 +42,6 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(EXAMPLE).unwrap();
-        assert_eq!(result, 161);
+        assert_eq!(result, "161");
     }
 }
