@@ -80,20 +80,15 @@ fn get_vertical_points_to_move(
     match tile_in_front {
         DoubleTile::Empty => vec![point_to_move],
         DoubleTile::Wall => Vec::new(),
-        DoubleTile::LeftBox => 
-            get_vertical_points_to_move_for_box(
-                point_to_move,
-                point_in_front,
-                grid,
-                direction,
-            ),
-        DoubleTile::RightBox => 
-            get_vertical_points_to_move_for_box(
-                point_to_move,
-                point_in_front + Vec2::LEFT,
-                grid,
-                direction,
-            ),
+        DoubleTile::LeftBox => {
+            get_vertical_points_to_move_for_box(point_to_move, point_in_front, grid, direction)
+        }
+        DoubleTile::RightBox => get_vertical_points_to_move_for_box(
+            point_to_move,
+            point_in_front + Vec2::LEFT,
+            grid,
+            direction,
+        ),
         DoubleTile::Robot => panic!("encountered a second robot"),
     }
 }

@@ -1,11 +1,19 @@
-
-use std::{collections::{HashMap, HashSet}, u64};
+use std::{
+    collections::{HashMap, HashSet},
+    u64,
+};
 
 use anyhow::{anyhow, bail, Result};
 use itertools::Itertools;
 use macros::aoc_solver;
 
-use crate::{common::{math_2d::{Grid, Point, PointIdx, Vec2}, parsing::parse_grid}, MyResult};
+use crate::{
+    common::{
+        math_2d::{Grid, Point, PointIdx, Vec2},
+        parsing::parse_grid,
+    },
+    MyResult,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Tile {
@@ -17,50 +25,60 @@ enum Tile {
 
 struct Map {
     grid: Grid<Tile>,
-    start_pos: Point<i32>
+    start_pos: Point<i32>,
 }
 
 #[aoc_solver(2024, 16, 1, super::INPUT)]
 fn solve(input: &str) -> MyResult<u64> {
     let map = parse_input(input)?;
-    
-    let visited = HashMap::new();
-    let score  = find_lowest_cost(&map.grid, &visited, map.start_pos, Vec2::RIGHT, 0, u64::MAX);
+
+    let (base_cost, visited) = find_cost_for_shortest_path(&map.grid, map.start_pos);
+    let score = find_lowest_cost(
+        &map.grid,
+        &visited,
+        map.start_pos,
+        Vec2::RIGHT,
+        0,
+        base_cost,
+    );
     Ok(score)
 }
 
 fn parse_input(input: &str) -> Result<Map> {
     let grid = parse_grid(input, map_char_to_tile)?;
-    let start_pos = grid.find_tile_position(Tile::Start)
+    let start_pos = grid
+        .find_tile_position(Tile::Start)
         .ok_or(anyhow!("Could not find the start position in the grid."))?;
-    Ok(Map {
-        grid, start_pos
-    })
+    Ok(Map { grid, start_pos })
 }
 
-fn find_lowest_cost(grid: &Grid<Tile>, visited: &HashMap<Point<i32>, u64>, current_pos: Point<i32>, current_dir: Vec2<i32>, current_cost: u64, best_cost_yet: u64) -> u64 {
-    // print_map(grid, current_pos, &Vec::new());
-    // std::io::stdin().read_line(&mut String::new()).unwrap();
-
+fn find_lowest_cost(
+    grid: &Grid<Tile>,
+    visited: &HashMap<Point<i32>, u64>,
+    current_pos: Point<i32>,
+    current_dir: Vec2<i32>,
+    current_cost: u64,
+    best_cost_yet: u64,
+) -> u64 {
     if let Some(existing_cost) = visited.get(&current_pos) {
-        if *existing_cost <= current_cost {
+        if *existing_cost < current_cost {
             // the point has already been reached with the same cost of less
-            return current_cost;
+            return u64::MAX;
         }
     }
 
     // point hasn't been visted yet or current path is more efficient
-
     let mut updated_visitied = visited.clone();
-    updated_visitied.insert(current_pos, current_cost); 
+    updated_visitied.insert(current_pos, current_cost);
 
     let current_tile = *grid.get_at(current_pos).unwrap();
 
     if current_tile == Tile::End {
+        println!("found end with cost: {}", current_cost);
         return current_cost;
     }
 
-    let next_points = get_next_points(grid, visited, current_pos, current_dir);
+    let next_points = get_next_points(grid, current_pos, current_dir);
     if next_points.is_empty() {
         return u64::MAX;
     }
@@ -71,30 +89,39 @@ fn find_lowest_cost(grid: &Grid<Tile>, visited: &HashMap<Point<i32>, u64>, curre
         if updated_cost > best_cost {
             // println!("{:?} is too expensive\n\n", next.pos);
             // exit early if the next move already exceeds the lowest score yet
-            return best_cost;
+            return u64::MAX;
         }
 
-        let next_cost = find_lowest_cost(grid, &updated_visitied, next.pos, next.dir, updated_cost, best_cost);
+        let next_cost = find_lowest_cost(
+            grid,
+            &updated_visitied,
+            next.pos,
+            next.dir,
+            updated_cost,
+            best_cost,
+        );
         best_cost = best_cost.min(next_cost);
     }
 
     best_cost
 }
 
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 struct NextPoint {
     pos: Point<i32>,
     dir: Vec2<i32>,
-    cost: u64, 
+    cost: u64,
 }
 
-fn get_next_points(grid: &Grid<Tile>, visited: &HashMap<Point<i32>, u64>, pos: Point<i32>, current_dir: Vec2<i32>) -> Vec<NextPoint> {
+fn get_next_points(grid: &Grid<Tile>, pos: Point<i32>, current_dir: Vec2<i32>) -> Vec<NextPoint> {
     let mut points = Vec::new();
 
     let next_pos = pos + current_dir;
     if *grid.get_at(next_pos).unwrap() != Tile::Wall {
         points.push(NextPoint {
-            pos: next_pos, dir: current_dir, cost: 1,
+            pos: next_pos,
+            dir: current_dir,
+            cost: 1,
         });
     }
 
@@ -102,14 +129,18 @@ fn get_next_points(grid: &Grid<Tile>, visited: &HashMap<Point<i32>, u64>, pos: P
     let left_pos = pos + left_dir;
     if *grid.get_at(left_pos).unwrap() != Tile::Wall {
         points.push(NextPoint {
-            pos: left_pos, dir: left_dir, cost: 1 + 1000,
+            pos: left_pos,
+            dir: left_dir,
+            cost: 1 + 1000,
         });
     }
 
     let right_pos = pos + right_dir;
     if *grid.get_at(right_pos).unwrap() != Tile::Wall {
         points.push(NextPoint {
-            pos: right_pos, dir: right_dir, cost: 1 + 1000,
+            pos: right_pos,
+            dir: right_dir,
+            cost: 1 + 1000,
         });
     }
 
@@ -118,21 +149,8 @@ fn get_next_points(grid: &Grid<Tile>, visited: &HashMap<Point<i32>, u64>, pos: P
         return Vec::new();
     }
 
-    let filtered = points
-        .into_iter()
-        .filter(|p| !visited.contains_key(&p.pos))
-        .collect_vec();
-
-    if filtered.is_empty() {
-        // println!("{:?} ends in a loop", pos);
-        return Vec::new();
-    }
-
-    // println!("next positions to try: {:?}", filtered);
-
-    filtered
+    points
 }
-
 
 fn get_next_dir(dir: Vec2<i32>) -> (Vec2<i32>, Vec2<i32>) {
     match dir {
@@ -140,7 +158,7 @@ fn get_next_dir(dir: Vec2<i32>) -> (Vec2<i32>, Vec2<i32>) {
         Vec2::UP => (Vec2::LEFT, Vec2::RIGHT),
         Vec2::LEFT => (Vec2::DOWN, Vec2::UP),
         Vec2::DOWN => (Vec2::RIGHT, Vec2::LEFT),
-        _ => panic!("invalid direction")
+        _ => panic!("invalid direction"),
     }
 }
 
@@ -154,12 +172,16 @@ fn map_char_to_tile(char: char) -> Result<Tile> {
     }
 }
 
+#[allow(dead_code)]
 fn print_map(grid: &Grid<Tile>, pos: Point<i32>, path: &[Point<i32>]) {
     println!();
     println!();
     for y in 0..grid.dim().height {
         for x in 0..grid.dim().width {
-            let point = Point{x: x as i32, y: y as i32};
+            let point = Point {
+                x: x as i32,
+                y: y as i32,
+            };
             if pos == point {
                 print!("S");
             } else if path.contains(&point) {
@@ -177,6 +199,60 @@ fn print_map(grid: &Grid<Tile>, pos: Point<i32>, path: &[Point<i32>]) {
         }
         println!()
     }
+}
+
+fn find_cost_for_shortest_path(
+    grid: &Grid<Tile>,
+    start_pos: Point<i32>,
+) -> (u64, HashMap<Point<i32>, u64>) {
+    let mut visited = HashMap::new();
+    let to_visit = HashSet::from([NextPoint {
+        pos: start_pos,
+        dir: Vec2::RIGHT,
+        cost: 0,
+    }]);
+    let s = bfs_sortest_path(grid, &mut visited, to_visit);
+
+    (s, visited)
+}
+
+fn bfs_sortest_path(
+    grid: &Grid<Tile>,
+    visited: &mut HashMap<Point<i32>, u64>,
+    to_visit: HashSet<NextPoint>,
+) -> u64 {
+    let neighbours = to_visit
+        .iter()
+        .flat_map(|n| {
+            get_next_points(grid, n.pos, n.dir)
+                .into_iter()
+                .map(|n2| NextPoint {
+                    pos: n2.pos,
+                    dir: n2.dir,
+                    cost: n.cost + n2.cost,
+                })
+        })
+        .collect_vec();
+
+    let mut next_to_visit: HashSet<NextPoint> = HashSet::new();
+    for neighbour in neighbours {
+        if *grid.get_at(neighbour.pos).unwrap() == Tile::End {
+            return neighbour.cost;
+        }
+
+        if let Some(&existing_cost) = visited.get(&neighbour.pos) {
+            if existing_cost <= neighbour.cost {
+                continue;
+            }
+        }
+
+        next_to_visit.insert(neighbour);
+    }
+    for n in to_visit {
+        visited.insert(n.pos, n.cost);
+    }
+
+    bfs_sortest_path(grid, visited, next_to_visit)
 }
 
 #[cfg(test)]

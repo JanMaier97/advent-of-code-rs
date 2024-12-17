@@ -16,7 +16,6 @@ impl<T> Grid<T> {
     pub fn dim(&self) -> Dimensions {
         self.dim
     }
-
 }
 
 impl<T: PartialEq> Grid<T> {
@@ -145,4 +144,3 @@ impl Dimensions {
         Ok(Dimensions::new(values.len().try_into()?, width.try_into()?))
     }
 }
-
