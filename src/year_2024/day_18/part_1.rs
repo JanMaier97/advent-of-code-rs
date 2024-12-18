@@ -19,15 +19,19 @@ fn solve(input: &str) -> Result<String> {
 }
 
 fn solve_for_inputs(input: &str, bytes_to_apply: usize, dim: Dimensions) -> Result<String> {
-    let corrupted = parse_input(input, bytes_to_apply)?;
+    let all_bytes = parse_input(input, bytes_to_apply)?;
+    let corrupted: HashSet<Point<i32>> = all_bytes.iter().take(bytes_to_apply).cloned().collect();
     let start = HashSet::from([Point::new(0, 0)]);
-    let steps = bfs_search(&corrupted, HashSet::new(), &start, dim, 0);
+
+    let path = bfs_search(&corrupted, HashSet::new(), &start, HashMap::new(), dim);
+    
+    let steps = path.len()-1;
 
     Ok(steps.to_string())
 }
 
-fn parse_input(input: &str, count: usize) -> Result<HashSet<Point<i32>>> {
-    let mut points = HashSet::new();
+fn parse_input(input: &str, count: usize) -> Result<Vec<Point<i32>>> {
+    let mut points = Vec::new();
     for (idx, line) in input.lines().enumerate() {
         if idx == count {
             break;
@@ -41,7 +45,7 @@ fn parse_input(input: &str, count: usize) -> Result<HashSet<Point<i32>>> {
         let x = split[0].parse::<i32>()?;
         let y = split[1].parse::<i32>()?;
 
-        points.insert(Point::new(x, y));
+        points.push(Point::new(x, y));
     }
 
     Ok(points)
@@ -49,25 +53,50 @@ fn parse_input(input: &str, count: usize) -> Result<HashSet<Point<i32>>> {
 
 fn bfs_search(
     corrupted: &HashSet<Point<i32>>,
-    visited: HashSet<Point<i32>>,
+    mut visited: HashSet<Point<i32>>,
     to_visit: &HashSet<Point<i32>>,
+    mut parent_map: HashMap<Point<i32>,Point<i32>>,
     dim: Dimensions,
-    step: u64,
-) -> u64 {
+) -> Vec<Point<i32>> {
+    let _ = parent_map;
     let goal = Point::new((dim.width - 1) as i32, (dim.height - 1) as i32);
-    if to_visit.contains(&goal) {
-        return step;
+
+    let mut next_to_visit: HashSet<Point<i32>> = HashSet::new();
+    for point in to_visit {
+        let neighbours = get_next_points(*point, dim)
+            .into_iter()
+            .filter(|p| !visited.contains(p) && !corrupted.contains(p))
+            .collect_vec();
+
+        for n in neighbours {
+            parent_map.insert(n, *point);
+            next_to_visit.insert(n);
+
+            if n == goal {
+                return collect_path(parent_map, goal);
+            }
+        }
+    } 
+
+    visited.extend(to_visit);
+
+    bfs_search(corrupted, visited, &next_to_visit, parent_map, dim)
+}
+
+fn collect_path(parent_map: HashMap<Point<i32>, Point<i32>>, goal: Point<i32>) -> Vec<Point<i32>> {
+    let mut path = vec![goal];
+
+    loop {
+        let child = path.last().unwrap();
+        let Some(parent) = parent_map.get(child) else {
+            break;
+        };
+        path.push(*parent);
     }
 
-    let next_to_visit: HashSet<_> = to_visit
-        .iter()
-        .flat_map(|p| get_next_points(*p, dim))
-        .filter(|p| !visited.contains(p) && !corrupted.contains(p))
-        .collect();
+    path.reverse();
 
-    let visited = visited.union(to_visit).cloned().collect();
-
-    bfs_search(corrupted, visited, &next_to_visit, dim, step + 1)
+    path
 }
 
 fn get_next_points(pos: Point<i32>, dim: Dimensions) -> HashSet<Point<i32>> {
