@@ -37,7 +37,7 @@ fn solve(input: &str) -> Result<String> {
 }
 
 fn apply_movement(map: &mut Map<DoubleTile>) {
-    for (_, dir) in map.directions.iter().cloned().enumerate() {
+    for dir in map.directions.iter().cloned() {
         let points_to_move = get_points_to_move(map.robot_pos, &map.grid, dir);
         for point in points_to_move.iter().cloned() {
             let tile_to_move = *map.grid.get_at(point).unwrap();
