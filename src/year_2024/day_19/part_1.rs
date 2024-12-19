@@ -3,53 +3,25 @@ use itertools::Itertools;
 use macros::aoc_solver;
 use regex::Regex;
 
-#[derive(Debug, Clone,Copy, PartialEq)]
-enum Color {
-    Black,
-    Blue,
-    Green,
-    Red,
-    White,
-}
-
-impl Color {
-    fn from_char(char: char) -> Self {
-        match char {
-            'w' => Color::White,
-            'b' => Color::Black,
-            'u' => Color::Blue,
-            'r' => Color::Red,
-            'g' => Color::Green,
-            _ => panic!("invalid color"),
-        }
-    }
-}
-
 struct PuzzleInput {
-    patterns: Vec<Vec<Color>>,
-    designs: Vec<Vec<Color>>,
+    patterns: Vec<String>,
+    designs: Vec<String>,
 }
 
 #[aoc_solver(2024, 19, 1, super::INPUT)]
 fn solve(input: &str) -> Result<String> {
     let puzzle_input = parse_input(input)?;
 
-    // let pattern = puzzle_input.patterns.
-    let reg = Regex::new("()")?;
+    let pattern = puzzle_input.patterns.join("|");
+    let reg = Regex::new(format!("^({})+$", pattern).as_str())?;
 
-    let valid_designs = puzzle_input.designs
+    let valid_designs = puzzle_input
+        .designs
         .iter()
-        .filter(|design| is_design_valid(design, &puzzle_input.patterns))
+        .filter(|design| reg.is_match(design))
         .count();
 
     Ok(valid_designs.to_string())
-}
-
-fn is_design_valid(design: &[Color], patterns: &[Vec<Color>]) -> bool {
-    
-    let 
-
-    false
 }
 
 fn parse_input(input: &str) -> Result<PuzzleInput> {
@@ -67,17 +39,12 @@ fn parse_input(input: &str) -> Result<PuzzleInput> {
     Ok(res)
 }
 
-fn parse_designs(input: &str) -> Vec<Vec<Color>> {
-    input
-        .lines()
-        .map(|l| l.chars().map(Color::from_char).collect_vec())
-        .collect_vec()
+fn parse_designs(input: &str) -> Vec<String> {
+    input.lines().map(|l| l.to_string()).collect_vec()
 }
 
-fn parse_patterns(line: &str) -> Vec<Vec<Color>> {
-    line.split(", ")
-        .map(|p| p.chars().map(Color::from_char).collect_vec())
-        .collect_vec()
+fn parse_patterns(line: &str) -> Vec<String> {
+    line.split(", ").map(|p| p.to_string()).collect_vec()
 }
 
 #[cfg(test)]
@@ -85,6 +52,6 @@ mod tests {
     #[test]
     fn solve_example() {
         let result = super::solve(include_str!("example.txt")).unwrap();
-        assert_eq!(result, "22");
+        assert_eq!(result, "6");
     }
 }

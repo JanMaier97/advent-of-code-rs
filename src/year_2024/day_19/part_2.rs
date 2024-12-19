@@ -8,7 +8,6 @@ fn solve(input: &str) -> Result<String> {
 
 #[cfg(test)]
 mod tests {
-    use crate::common::math_2d::Dimensions;
 
     #[test]
     fn solve_example() {
