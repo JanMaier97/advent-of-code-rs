@@ -12,17 +12,15 @@ struct PuzzleInput {
     designs: Vec<String>,
 }
 
-
-fn get_valid_designs(input: &str) -> Result<Vec<String>> {
-    let puzzle_input = parse_input(input)?;
-
+fn get_valid_designs(puzzle_input: &PuzzleInput) -> Result<Vec<String>> {
     let pattern = puzzle_input.patterns.join("|");
     let reg = Regex::new(format!("^({})+$", pattern).as_str())?;
 
     let designs = puzzle_input
         .designs
-        .into_iter()
+        .iter()
         .filter(|design| reg.is_match(design))
+        .cloned()
         .collect_vec();
 
     Ok(designs)
