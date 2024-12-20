@@ -1,6 +1,9 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::common::{math_2d::{Grid, Point, PointIdx, Vec2}, parsing::parse_grid};
+use crate::common::{
+    math_2d::{Grid, Point, PointIdx, Vec2},
+    parsing::parse_grid,
+};
 
 use anyhow::{anyhow, bail, Result};
 use itertools::Itertools;
@@ -22,7 +25,6 @@ struct Input {
     grid: Grid<Tile>,
     path: Vec<Point<i32>>,
 }
-
 
 fn count_shortcuts_by_time_saved(input: &Input) -> HashMap<usize, usize> {
     let shortcuts = find_shortcuts(&input.grid, &input.path);

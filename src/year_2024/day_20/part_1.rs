@@ -6,7 +6,6 @@ use crate::year_2024::day_20::INPUT;
 
 use super::{count_shortcuts_by_time_saved, parse_input};
 
-
 #[aoc_solver(2024, 20, 1, INPUT)]
 fn solve(input: &str) -> Result<String> {
     let input = parse_input(input)?;
@@ -21,7 +20,6 @@ fn solve(input: &str) -> Result<String> {
 
     Ok(sum.to_string())
 }
-
 
 #[cfg(test)]
 mod tests {
