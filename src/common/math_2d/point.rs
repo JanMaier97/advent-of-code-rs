@@ -1,11 +1,20 @@
-use std::ops::{Add, AddAssign, Rem, Sub};
+use std::{
+    fmt::Debug,
+    ops::{Add, AddAssign, Rem, Sub},
+};
 
 use super::Vec2;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Point<T> {
     pub x: T,
     pub y: T,
+}
+
+impl<T: Debug> Debug for Point<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("({:?}, {:?})", self.x, self.y))
+    }
 }
 
 impl<T> Point<T> {

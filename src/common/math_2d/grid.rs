@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 use anyhow::{bail, Result};
 
 use super::Point;
@@ -15,6 +17,14 @@ impl<T> Grid<T> {
 
     pub fn dim(&self) -> Dimensions {
         self.dim
+    }
+}
+
+impl<T> Index<Point<i32>> for Grid<T> {
+    type Output = T;
+
+    fn index(&self, index: Point<i32>) -> &Self::Output {
+        self.get_at(index).unwrap()
     }
 }
 
