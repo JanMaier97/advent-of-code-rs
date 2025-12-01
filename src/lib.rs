@@ -7,6 +7,7 @@ pub mod common;
 mod year_2022;
 pub mod year_2023;
 mod year_2024;
+mod year_2025;
 
 pub type MyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -99,7 +100,7 @@ struct SolverData<'a> {
 }
 
 #[distributed_slice]
-pub static SOLVERS: [SolverMetadata];
+pub static SOLVERS: [SolverMetadata<'static>];
 
 struct SolverMetadata<'a> {
     year: u16,
