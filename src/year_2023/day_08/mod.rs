@@ -1,10 +1,9 @@
-use std::{collections::HashMap, f32::consts::E};
+use std::collections::HashMap;
 
+use anyhow::Result;
 use itertools::Itertools;
-use rayon::collections::hash_map;
+use macros::aoc_solver;
 use regex::Regex;
-
-use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -23,16 +22,8 @@ struct PuzzleInput {
     network: HashMap<String, Edge>,
 }
 
-pub fn solve() -> MyResult<()> {
-    print_challenge_header(8);
-
-    println!("The total number of steps is {}", solve_part_one(INPUT));
-    println!("The total winnings are {}", solve_part_two(INPUT));
-
-    Ok(())
-}
-
-fn solve_part_one(input: &str) -> u32 {
+#[aoc_solver(2023, 8, 1, INPUT)]
+fn solve_part_one(input: &str) -> Result<String> {
     let puzzle_input = parse_input(input);
 
     let mut step_count = 0;
@@ -53,10 +44,11 @@ fn solve_part_one(input: &str) -> u32 {
         }
     }
 
-    step_count as u32
+    Ok(step_count.to_string())
 }
 
-fn solve_part_two(input: &str) -> u32 {
+#[aoc_solver(2023, 8, 2, INPUT)]
+fn solve_part_two(input: &str) -> Result<String> {
     let puzzle_input = parse_input(input);
 
     let mut step_count = 0;
@@ -84,7 +76,7 @@ fn solve_part_two(input: &str) -> u32 {
         }
     }
 
-    step_count as u32
+    Ok(step_count.to_string())
 }
 
 fn parse_input(input: &str) -> PuzzleInput {
@@ -135,31 +127,31 @@ mod tests {
 
     #[test]
     fn part_one_example1_input_correct() {
-        let result = solve_part_one(EXAMPLE1_INPUT);
-        assert_eq!(result, 2);
+        let result = solve_part_one(EXAMPLE1_INPUT).unwrap();
+        assert_eq!(result, "2");
     }
 
     #[test]
     fn part_one_example2_input_correct() {
-        let result = solve_part_one(EXAMPLE2_INPUT);
-        assert_eq!(result, 6);
+        let result = solve_part_one(EXAMPLE2_INPUT).unwrap();
+        assert_eq!(result, "6");
     }
 
     #[test]
     fn part_one_real_input_correct() {
-        let result = solve_part_one(INPUT);
-        assert_eq!(result, 16579);
+        let result = solve_part_one(INPUT).unwrap();
+        assert_eq!(result, "16579");
     }
 
     #[test]
     fn part_two_example3_input_correct() {
-        let result = solve_part_two(EXAMPLE3_INPUT);
-        assert_eq!(result, 6);
+        let result = solve_part_two(EXAMPLE3_INPUT).unwrap();
+        assert_eq!(result, "6");
     }
 
     #[test]
     fn part_two_real_input_correct() {
-        let result = solve_part_two(INPUT);
-        assert_eq!(result, 0);
+        let result = solve_part_two(INPUT).unwrap();
+        assert_eq!(result, "0");
     }
 }

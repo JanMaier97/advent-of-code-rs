@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use crate::{print_challenge_header, MyResult};
+use macros::aoc_solver;
+
+use anyhow::Result;
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -30,23 +32,17 @@ impl Cards {
     }
 }
 
-pub fn solve() -> MyResult<()> {
-    print_challenge_header(4);
-
-    println!("{}", solve_part_one(INPUT));
-    println!("{}", solve_part_two(INPUT));
-    Ok(())
-}
-
-fn solve_part_one(input: &str) -> u32 {
+#[aoc_solver(2023, 4, 1, INPUT)]
+fn solve_part_one(input: &str) -> Result<String> {
     let cards = parse_input(input);
 
-    let total_score = cards.iter().map(|c| c.points()).sum();
+    let total_score: u32 = cards.iter().map(|c| c.points()).sum();
 
-    total_score
+    Ok(total_score.to_string())
 }
 
-fn solve_part_two(input: &str) -> u32 {
+#[aoc_solver(2023, 4, 2, INPUT)]
+fn solve_part_two(input: &str) -> Result<String> {
     let cards = parse_input(input);
     let mut card_count_mapping = cards
         .iter()
@@ -67,7 +63,8 @@ fn solve_part_two(input: &str) -> u32 {
         }
     }
 
-    card_count_mapping.into_iter().map(|(_, count)| count).sum()
+    let sum: u32 = card_count_mapping.into_iter().map(|(_, count)| count).sum();
+    Ok(sum.to_string())
 }
 
 fn parse_input(input: &str) -> Vec<Cards> {
@@ -117,25 +114,25 @@ mod tests {
 
     #[test]
     fn example_input_part_one_solved_correctly() {
-        let result = solve_part_one(EXAMPLE_INPUT);
-        assert_eq!(result, 13);
+        let result = solve_part_one(EXAMPLE_INPUT).unwrap();
+        assert_eq!(result, "13");
     }
 
     #[test]
     fn real_input_part_one_solved_correctly() {
-        let result = solve_part_one(INPUT);
-        assert_eq!(result, 20829);
+        let result = solve_part_one(INPUT).unwrap();
+        assert_eq!(result, "20829");
     }
 
     #[test]
     fn example_input_part_two_solved_correctly() {
-        let result = solve_part_two(EXAMPLE_INPUT);
-        assert_eq!(result, 30);
+        let result = solve_part_two(EXAMPLE_INPUT).unwrap();
+        assert_eq!(result, "30");
     }
 
     #[test]
     fn real_input_part_two_solved_correctly() {
-        let result = solve_part_two(INPUT);
-        assert_eq!(result, 12648035);
+        let result = solve_part_two(INPUT).unwrap();
+        assert_eq!(result, "12648035");
     }
 }

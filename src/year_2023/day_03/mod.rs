@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
+use anyhow::Result;
 use itertools::Itertools;
-
-use crate::{print_challenge_header, MyResult};
+use macros::aoc_solver;
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -64,28 +64,21 @@ impl NumberPosition {
     }
 }
 
-pub fn solve() -> MyResult<()> {
-    print_challenge_header(3);
-
-    println!("The sum of all part numbers is: {}", solve_part_one(INPUT));
-    println!("The total gear power is: {}", solve_part_two(INPUT));
-
-    Ok(())
-}
-
-fn solve_part_one(input: &str) -> u32 {
+#[aoc_solver(2023, 3, 1, INPUT)]
+fn solve_part_one(input: &str) -> Result<String> {
     let (numbers, symbols) = parse_input(input);
 
-    let sum = numbers
+    let sum: u32 = numbers
         .iter()
         .filter(|n| n.is_part_number(&symbols))
         .map(|n| n.value)
         .sum();
 
-    return sum;
+    Ok(sum.to_string())
 }
 
-fn solve_part_two(input: &str) -> u32 {
+#[aoc_solver(2023, 3, 2, INPUT)]
+fn solve_part_two(input: &str) -> Result<String> {
     let (numbers, symbols) = parse_input(input);
 
     let part_numbers_positions = numbers
@@ -94,12 +87,12 @@ fn solve_part_two(input: &str) -> u32 {
         .flat_map(|n| n.get_positions().into_iter().map(|pos| (pos, n.value)))
         .collect::<HashMap<_, _>>();
 
-    let sum = symbols
+    let sum: u32 = symbols
         .into_iter()
         .map(|pos| calculate_gear_value(&pos, &part_numbers_positions))
         .sum();
 
-    sum
+    Ok(sum.to_string())
 }
 
 fn calculate_gear_value(symbol_pos: &Position, part_numbers: &HashMap<Position, u32>) -> u32 {
@@ -225,25 +218,25 @@ mod tests {
 
     #[test]
     fn part_one_example_solved_correctly() {
-        let result = solve_part_one(EXAMPLE_INPUT);
-        assert_eq!(result, 4361)
+        let result = solve_part_one(EXAMPLE_INPUT).unwrap();
+        assert_eq!(result, "4361")
     }
 
     #[test]
     fn part_one_input_solved_correctly() {
-        let result = solve_part_one(INPUT);
-        assert_eq!(result, 537832)
+        let result = solve_part_one(INPUT).unwrap();
+        assert_eq!(result, "537832")
     }
 
     #[test]
     fn part_two_example_solved_correctly() {
-        let result = solve_part_two(EXAMPLE_INPUT);
-        assert_eq!(result, 467835)
+        let result = solve_part_two(EXAMPLE_INPUT).unwrap();
+        assert_eq!(result, "467835")
     }
 
     #[test]
     fn part_two_input_solved_correctly() {
-        let result = solve_part_two(INPUT);
-        assert_eq!(result, 81939900)
+        let result = solve_part_two(INPUT).unwrap();
+        assert_eq!(result, "81939900")
     }
 }

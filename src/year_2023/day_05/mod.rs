@@ -1,9 +1,9 @@
 use std::ops::Index;
 
+use anyhow::Result;
 use itertools::Itertools;
+use macros::aoc_solver;
 use rayon::prelude::*;
-
-use crate::{print_challenge_header, MyResult};
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -19,19 +19,16 @@ struct PuzzleInput {
     mappings: Vec<Vec<MappingRange>>,
 }
 
-pub fn solve() -> MyResult<()> {
-    print_challenge_header(5);
+#[aoc_solver(2023, 5, 1, INPUT)]
+fn solve_part_one(input: &str) -> Result<String> {
+    let puzzle_input = parse_input(input);
+    let res = determine_lowest_location(&puzzle_input.seeds, &puzzle_input.mappings);
 
-    println!("The lowest location number is: {}", solve_part_one(INPUT));
-    println!(
-        "The actual lowest location number is: {}",
-        solve_part_two(INPUT)
-    );
-
-    Ok(())
+    Ok(res.to_string())
 }
 
-pub fn solve_part_two(input: &str) -> u64 {
+#[aoc_solver(2023, 5, 2, INPUT)]
+pub fn solve_part_two(input: &str) -> Result<String> {
     let puzzle = parse_input(input);
 
     assert!(puzzle.seeds.len() % 2 == 0);
@@ -66,12 +63,7 @@ pub fn solve_part_two(input: &str) -> u64 {
         }
     }
 
-    lowest_location
-}
-
-fn solve_part_one(input: &str) -> u64 {
-    let puzzle_input = parse_input(input);
-    determine_lowest_location(&puzzle_input.seeds, &puzzle_input.mappings)
+    Ok(lowest_location.to_string())
 }
 
 fn determine_lowest_location(seeds: &[u64], mappings: &[Vec<MappingRange>]) -> u64 {
@@ -156,9 +148,10 @@ fn parse_seeds(input: &str) -> Vec<u64> {
     seeds
 }
 
+// TODO: implement os independent line endings
 fn parse_mappings(input: &str) -> Vec<Vec<MappingRange>> {
     let mappings = input
-        .split("\r\n\r\n")
+        .split("\n\n")
         .skip(1)
         .map(parse_mapping_paragraph)
         .collect_vec();
@@ -200,26 +193,26 @@ mod tests {
 
     #[test]
     fn part_one_example_input_solved_correctly() {
-        let result = solve_part_one(EXAMPLE_INPUT);
-        assert_eq!(result, 35);
+        let result = solve_part_one(EXAMPLE_INPUT).unwrap();
+        assert_eq!(result, "35");
     }
 
     #[test]
     fn part_one_real_input_solved_correctly() {
-        let result = solve_part_one(INPUT);
-        assert_eq!(result, 309796150);
+        let result = solve_part_one(INPUT).unwrap();
+        assert_eq!(result, "309796150");
     }
 
     #[test]
     fn part_two_example_input_solved_correctly() {
-        let result = solve_part_two(EXAMPLE_INPUT);
-        assert_eq!(result, 46);
+        let result = solve_part_two(EXAMPLE_INPUT).unwrap();
+        assert_eq!(result, "46");
     }
 
     #[test]
     fn part_two_real_input_solved_correctly() {
-        let result = solve_part_two(INPUT);
-        assert_eq!(result, 50716416);
+        let result = solve_part_two(INPUT).unwrap();
+        assert_eq!(result, "50716416");
     }
 
     #[test]
