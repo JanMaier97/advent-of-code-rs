@@ -1,6 +1,7 @@
 use itertools::Itertools;
+use anyhow::Result;
 
-use crate::{print_challenge_header, MyResult};
+use macros::aoc_solver;
 
 const INPUT: &str = include_str!("input.txt");
 
@@ -10,43 +11,25 @@ struct Race {
     distance: u64,
 }
 
-pub fn solve() -> MyResult<()> {
-    print_challenge_header(6);
-
-    println!(
-        "The product of all win possibilities is {}",
-        solve_part_one(INPUT)
-    );
-
-    println!(
-        "The product of win possibilities for the actual race is {}",
-        solve_part_two(INPUT)
-    );
-
-    Ok(())
-}
-
-fn solve_part_one(input: &str) -> u64 {
+#[aoc_solver(2023, 6, 1, INPUT)]
+fn solve_part_one(input: &str) -> Result<String> {
     let races = parse_input(input);
 
-    let res = races
+    let res: u64 = races
         .iter()
         .map(|r| compute_min_and_max_button_duration(r))
         .map(|(min, max)| max - min + 1)
         .product();
 
-    res
+    Ok(res.to_string())
 }
 
-fn solve_part_two(input: &str) -> u64 {
+#[aoc_solver(2023, 6, 2, INPUT)]
+fn solve_part_two(input: &str) -> Result<String> {
     let race = parse_input_as_single_race(input);
-    println!("time: {}, distance: {}", race.time, race.distance);
-
     let (min, max) = compute_min_and_max_button_duration(&race);
 
-    println!("min: {}, max: {}", min, max);
-
-    max - min + 1
+    Ok((max - min + 1).to_string())
 }
 
 fn parse_input_as_single_race(input: &str) -> Race {
@@ -109,25 +92,25 @@ mod tests {
 
     #[test]
     fn example_input_part_one_solved_correctly() {
-        let result = solve_part_one(EXAMPLE_INPUT);
-        assert_eq!(result, 288);
+        let result = solve_part_one(EXAMPLE_INPUT).unwrap();
+        assert_eq!(result, "288");
     }
 
     #[test]
     fn real_input_part_one_solved_correctly() {
-        let result = solve_part_one(INPUT);
-        assert_eq!(result, 1413720);
+        let result = solve_part_one(INPUT).unwrap();
+        assert_eq!(result, "1413720");
     }
 
     #[test]
     fn example_input_part_two_solved_correctly() {
-        let result = solve_part_two(EXAMPLE_INPUT);
-        assert_eq!(result, 71503);
+        let result = solve_part_two(EXAMPLE_INPUT).unwrap();
+        assert_eq!(result, "71503");
     }
 
     #[test]
     fn real_input_part_two_solved_correctly() {
-        let result = solve_part_two(INPUT);
-        assert_eq!(result, 30565288);
+        let result = solve_part_two(INPUT).unwrap();
+        assert_eq!(result, "30565288");
     }
 }
