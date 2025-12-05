@@ -1,5 +1,5 @@
-use itertools::Itertools;
 use anyhow::Result;
+use itertools::Itertools;
 
 use macros::aoc_solver;
 

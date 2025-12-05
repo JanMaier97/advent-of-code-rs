@@ -9,7 +9,7 @@ use crate::{
     year_2024::day_20::INPUT,
 };
 
-use super::{count_shortcuts_by_time_saved, parse_input, Tile};
+use super::{parse_input, Tile};
 
 #[aoc_solver(2024, 20, 2, INPUT)]
 fn solve(input: &str) -> Result<String> {
@@ -110,9 +110,7 @@ fn get_free_points_within_distance(
 
 #[cfg(test)]
 mod tests {
-    use crate::year_2024::day_20::{
-        count_shortcuts_by_time_saved, parse_input, part_2::count_shortcuts,
-    };
+    use crate::year_2024::day_20::{parse_input, part_2::count_shortcuts};
 
     #[test]
     fn finds_correct_shortcuts() {
