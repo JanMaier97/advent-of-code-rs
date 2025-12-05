@@ -60,12 +60,4 @@ impl HandRule for JokerRule {
             cards: original_cards,
         }
     }
-
-    fn r#type(&self) -> HandType {
-        self.r#type.clone()
-    }
-
-    fn cards(&self) -> Vec<u32> {
-        self.cards.clone()
-    }
 }

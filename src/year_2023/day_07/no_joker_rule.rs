@@ -16,14 +16,6 @@ impl HandRule for NoJokerRule {
             cards: cards,
         }
     }
-
-    fn r#type(&self) -> HandType {
-        self.r#type.clone()
-    }
-
-    fn cards(&self) -> Vec<u32> {
-        self.cards.clone()
-    }
 }
 
 impl NoJokerRule {
