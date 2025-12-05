@@ -40,8 +40,6 @@ fn get_voltage(line: &str, digit_count: usize) -> Result<u64> {
     let mut last_digit_idx: usize = 0;
     let mut digits = Vec::with_capacity(digit_count);
 
-    println!("{}", line);
-
     for iteration in 0..digit_count {
         let search_range =
             line.len() - (last_digit_idx + iteration.min(1)) - (digit_count - iteration - 1);
@@ -49,8 +47,8 @@ fn get_voltage(line: &str, digit_count: usize) -> Result<u64> {
         let (idx, digit) = line
             .chars()
             .enumerate()
-            .skip(dbg!(skip))
-            .take(dbg!(search_range))
+            .skip(skip)
+            .take(search_range)
             .reduce(|(lidx, l), (ridx, r)| if r > l { (ridx, r) } else { (lidx, l) })
             .unwrap();
 
@@ -58,15 +56,14 @@ fn get_voltage(line: &str, digit_count: usize) -> Result<u64> {
             ensure!(last_digit_idx < idx);
         }
 
-        last_digit_idx = dbg!(idx);
-        digits.push(dbg!(digit));
+        last_digit_idx = idx;
+        digits.push(digit);
     }
 
     ensure!(digits.len() == digit_count);
 
     let voltage = digits.iter().collect::<String>().parse::<u64>()?;
 
-    println!("{}", voltage);
     Ok(voltage)
 }
 
