@@ -29,6 +29,31 @@ fn solve_part_1(input: &str) -> Result<String> {
     return Ok(count.to_string());
 }
 
+#[aoc_solver(2025, 5, 2, INPUT)]
+fn solve_part_2(input: &str) -> Result<String> {
+    let data = parse_input(input)?;
+    let count = count_ranges(&data.fresh_ingredients);
+    Ok(count.to_string())
+}
+
+fn count_ranges(ranges: &[Range]) -> u64 {
+    let mut count = 0;
+    let mut highest_id = 0;
+
+    for range in ranges {
+        if range.end <= highest_id {
+            continue;
+        }
+
+        let start = range.start.max(highest_id + 1);
+        count += range.end - start + 1;
+
+        highest_id = range.end;
+    }
+
+    return count;
+}
+
 fn is_fresh(ingredient: u64, fresh_ingredients: &[Range]) -> bool {
     for range in fresh_ingredients {
         if ingredient < range.start {
@@ -93,8 +118,20 @@ mod tests {
     }
 
     #[test]
+    fn solve_example_part_2() {
+        let result = super::solve_part_2(include_str!("example.txt")).unwrap();
+        assert_eq!(result, "14");
+    }
+
+    #[test]
     fn solve_part_1() {
         let result = super::solve_part_1(super::INPUT).unwrap();
-        assert_eq!(result, "362");
+        assert_eq!(result, "623");
+    }
+
+    #[test]
+    fn solve_part_2() {
+        let result = super::solve_part_2(super::INPUT).unwrap();
+        assert_eq!(result, "353507173555373");
     }
 }
