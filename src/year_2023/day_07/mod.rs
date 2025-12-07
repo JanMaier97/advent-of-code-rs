@@ -37,7 +37,7 @@ fn solve_part_one(input: &str) -> Result<String> {
     Ok(res.to_string())
 }
 
-#[aoc_solver(2025, 7, 2, INPUT)]
+#[aoc_solver(2023, 7, 2, INPUT)]
 fn solve_part_two(input: &str) -> Result<String> {
     let mut bids = parse_input::<JokerRule>(input);
 

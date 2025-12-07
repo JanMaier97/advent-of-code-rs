@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use macros::aoc_solver;
 
@@ -55,6 +55,39 @@ fn solve_part_1(input: &str) -> Result<String> {
     Ok(hit_splitters.len().to_string())
 }
 
+#[aoc_solver(2025, 7, 2, INPUT)]
+fn solve_part_2(input: &str) -> Result<String> {
+    let grid = parse_input(input)?;
+    let start_pos = grid
+        .find_value(Tile::Start)
+        .ok_or(anyhow!("Input does not contain the starting position"))?;
+
+    let mut cache = HashMap::new();
+    let count = count_beam_paths(&grid, start_pos, &mut cache);
+    Ok(count.to_string())
+}
+
+fn count_beam_paths(grid: &Grid<Tile>, start: UPoint, cache: &mut HashMap<UPoint, usize>) -> usize {
+    if let Some(count) = cache.get(&start) {
+        return *count;
+    }
+
+    let Some(split_pos) = find_splitter_pos(grid, start) else {
+        return 1;
+    };
+
+    let left_beam = split_pos.checked_sub(UPoint::new(1, 0)).unwrap();
+    let right_beam = split_pos.checked_add(UPoint::new(1, 0)).unwrap();
+
+    let left_branch = count_beam_paths(grid, left_beam, cache);
+    let right_branch = count_beam_paths(grid, right_beam, cache);
+
+    cache.insert(left_beam, left_branch);
+    cache.insert(right_beam, right_branch);
+
+    left_branch + right_branch
+}
+
 fn find_splitter_pos(grid: &Grid<Tile>, beam: UPoint) -> Option<UPoint> {
     for y in beam.y..grid.udims().height {
         let point = UPoint::new(beam.x, y);
@@ -92,8 +125,20 @@ mod tests {
     }
 
     #[test]
+    fn solve_example_part_2() {
+        let result = super::solve_part_2(include_str!("example.txt")).unwrap();
+        assert_eq!(result, "40");
+    }
+
+    #[test]
     fn solve_part_1() {
         let result = super::solve_part_1(super::INPUT).unwrap();
         assert_eq!(result, "1546");
+    }
+
+    #[test]
+    fn solve_part_2() {
+        let result = super::solve_part_2(super::INPUT).unwrap();
+        assert_eq!(result, "13883459503480");
     }
 }
