@@ -2,7 +2,7 @@ use std::ops::Index;
 
 use anyhow::{bail, Result};
 
-use super::Point;
+use super::{Point, UPoint};
 
 pub struct Grid<T> {
     values: Vec<Vec<T>>,
@@ -18,6 +18,20 @@ impl<T> Grid<T> {
     pub fn dim(&self) -> Dimensions {
         self.dim
     }
+
+    pub fn udims(&self) -> UDimensions {
+        UDimensions {
+            width: self.dim.width as usize,
+            height: self.dim.height as usize,
+        }
+    }
+
+    pub fn get(&self, point: UPoint) -> Option<&T> {
+        if !self.dim.is_in_bounds(point) {
+            return None;
+        }
+        Some(&self.values[point.y][point.x])
+    }
 }
 
 impl<T> Index<Point<i32>> for Grid<T> {
@@ -29,6 +43,18 @@ impl<T> Index<Point<i32>> for Grid<T> {
 }
 
 impl<T: PartialEq> Grid<T> {
+    pub fn find_value(&self, value: T) -> Option<UPoint> {
+        for (row_idx, rows) in self.values.iter().enumerate() {
+            for (col_idx, col) in rows.iter().enumerate() {
+                if *col == value {
+                    return Some(UPoint::new(col_idx, row_idx));
+                }
+            }
+        }
+
+        None
+    }
+
     pub fn find_tile_position(&self, target_tile: T) -> Option<Point<i32>> {
         for row in 0..self.dim().height {
             for col in 0..self.dim().width {
@@ -113,9 +139,26 @@ pub struct Dimensions {
     pub width: u64,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+pub struct UDimensions {
+    pub height: usize,
+    pub width: usize,
+}
+
 impl Dimensions {
     fn new(height: u64, width: u64) -> Self {
         Self { height, width }
+    }
+
+    fn is_in_bounds(&self, point: UPoint) -> bool {
+        if point.x < 0 || point.y < 0 {
+            return false;
+        }
+
+        let width = self.width as usize;
+        let height = self.height as usize;
+
+        point.x < width && point.y < height
     }
 
     fn is_point_inside(&self, point: Point<i32>) -> bool {

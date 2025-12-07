@@ -22,7 +22,7 @@ enum HandType {
     HighCard = 1,
 }
 
-#[aoc_solver(2025, 7, 1, INPUT)]
+#[aoc_solver(2023, 7, 1, INPUT)]
 fn solve_part_one(input: &str) -> Result<String> {
     let mut bids = parse_input::<NoJokerRule>(input);
 

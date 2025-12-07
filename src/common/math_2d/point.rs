@@ -5,6 +5,30 @@ use std::{
 
 use super::Vec2;
 
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+pub struct UPoint {
+    pub x: usize,
+    pub y: usize,
+}
+
+impl UPoint {
+    pub fn new(x: usize, y: usize) -> Self {
+        Self { x, y }
+    }
+
+    pub fn checked_sub(&self, other: UPoint) -> Option<Self> {
+        let x = self.x.checked_sub(other.x)?;
+        let y = self.y.checked_sub(other.y)?;
+        Some(UPoint::new(x, y))
+    }
+
+    pub fn checked_add(&self, other: UPoint) -> Option<Self> {
+        let x = self.x.checked_add(other.x)?;
+        let y = self.y.checked_add(other.y)?;
+        Some(UPoint::new(x, y))
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Point<T> {
     pub x: T,
