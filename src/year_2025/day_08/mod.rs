@@ -21,7 +21,7 @@ impl Point3 {
 
 struct CircuitResult {
     sizes: Vec<usize>,
-    last_pair: (Point3, Point3)
+    last_pair: (Point3, Point3),
 }
 
 #[aoc_solver(2025, 8, 1, INPUT)]
@@ -96,10 +96,7 @@ fn get_circuits_sizes(point_pairs: &[(Point3, Point3)]) -> Result<CircuitResult>
 
     let sizes = circuits.iter().map(|c| c.len()).collect::<Vec<_>>();
 
-    Ok(CircuitResult { 
-        sizes,
-        last_pair,
-    })
+    Ok(CircuitResult { sizes, last_pair })
 }
 
 fn get_pairs_sorted(points: &HashSet<Point3>) -> Vec<(Point3, Point3)> {
