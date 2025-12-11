@@ -95,7 +95,11 @@ fn generate_vertical_outline(points: &[Vec2<i64>]) -> HashSet<Vec2<i64>> {
     let max_y = points_on_outline.iter().map(|p| p.y).max().unwrap();
 
     for y in min_y..max_y {
-        let mut points_on_row = points_on_outline.iter().cloned().filter(|p| p.y == y).collect::<Vec<_>>();
+        let mut points_on_row = points_on_outline
+            .iter()
+            .cloned()
+            .filter(|p| p.y == y)
+            .collect::<Vec<_>>();
         if points_on_row.len() % 2 == 0 {
             continue;
         }
@@ -104,8 +108,6 @@ fn generate_vertical_outline(points: &[Vec2<i64>]) -> HashSet<Vec2<i64>> {
             points_on_outline.remove(&points_on_row[i]);
         }
     }
-
-
 
     points_on_outline
 }
