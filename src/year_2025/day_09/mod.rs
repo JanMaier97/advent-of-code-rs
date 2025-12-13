@@ -27,89 +27,135 @@ fn solve_part_1(input: &str) -> Result<String> {
 #[aoc_solver(2025, 9, 2, INPUT)]
 fn solve_part_2(input: &str) -> Result<String> {
     let points = parse_points(input)?;
-    let orderd = get_points_in_order(&points);
-    // let ps = points.iter().cloned().collect::<HashSet<_>>();
-    // print_points(&ps);
-    // let outline = generate_vertical_outline(&points);
-    // let shape_points = get_points_in_outline(&outline);
+    let max_x =  get_max_x(&points);
+    let outline = get_points_on_outline(&points);
 
     // print_points(&outline);
-    // print_points(&shape_points);
 
-    Ok("".to_string())
+    let mut max_size = 0;
+    for p1 in points.iter().take(points.len() - 1) {
+        for p2 in points.iter().skip(1) {
+            if !rect_inside_shape(*p1, *p2, &outline, max_x) {
+                continue;
+            }
+            let vec = *p2 - *p1;
+            let size = (vec.x.abs() + 1) * (vec.y.abs() + 1);
+            max_size = size.max(max_size);
+        }
+    }
+
+    Ok(max_size.to_string())
 }
 
-fn get_points_in_outline(outline: &HashSet<Vec2<i64>>) -> HashSet<Vec2<i64>> {
-    let min_x = outline.iter().map(|p| p.x).min().unwrap();
-    let max_x = outline.iter().map(|p| p.x).max().unwrap();
-    let min_y = outline.iter().map(|p| p.y).min().unwrap();
-    let max_y = outline.iter().map(|p| p.y).max().unwrap();
+fn get_points_on_outline(points: &[Vec2<i64>]) -> HashSet<Vec2<i64>> {
+    let ordered = get_points_in_order(&points);
 
-    let mut filled_outline = outline.clone();
-    for y in min_y..=max_y {
-        let mut current_pos_is_in_shpe = false;
-        for x in min_x..=max_x {
-            let point = Vec2::new(x, y);
-            match (current_pos_is_in_shpe, outline.contains(&point)) {
-                (false, false) => {
-                    // do nothing
-                }
-                (false, true) => {
-                    current_pos_is_in_shpe = true;
-                }
-                (true, false) => {
-                    filled_outline.insert(point);
-                }
-                (true, true) => {
-                    current_pos_is_in_shpe = false;
-                }
+    let mut outline = HashSet::new();
+    for (p1, p2) in ordered.iter().take(ordered.len() - 1).zip(ordered.iter().skip(1)) {
+        let edge_points = get_points_on_edge(*p1, *p2);
+        outline.extend(edge_points.iter());
+    }
+
+
+    outline
+}
+
+fn get_points_on_edge(p1: Vec2<i64>, p2: Vec2<i64>) -> Vec<Vec2<i64>> {
+    assert!(p1.x == p2.x || p1.y == p1.y);
+
+    let mut points = vec![p1];
+    let dir = get_direction_normal(p1, p2);
+    let mut current_pos = p1;
+    loop {
+        current_pos = current_pos + dir;
+        points.push(current_pos);
+        if current_pos == p2 {
+            break;
+        }
+    }
+
+    points
+}
+
+fn rect_inside_shape(p1: Vec2<i64>, p2: Vec2<i64>, outline: &HashSet<Vec2<i64>>, max_x: i64) -> bool {
+    let points = vec![p1, Vec2::new(p1.x, p2.y), p2, Vec2::new(p2.x, p1.y), p1];
+
+    if !point_inside_shape(points[1], outline, max_x) || !point_inside_shape(points[3], outline, max_x) {
+        return false;
+    }
+    // println!("rect points: {points:?}");
+    for (e1, e2) in points.iter().take(points.len()-1).zip(points.iter().skip(1)) {
+        assert!(e1.x == e2.x || e1.y == e2.y, "points {e1:?} and {e2:?} are not on the same line\npoints: {points:?}");
+        let dir = get_direction_normal(*e1, *e2);
+        let mut current_pos = *e1;
+        loop {
+            if !point_inside_shape(current_pos, outline, max_x) {
+                return false;
+            }
+            current_pos = current_pos + dir;
+            if current_pos == *e2 {
+                break;
             }
         }
     }
 
-    filled_outline
+    true
 }
 
-fn generate_vertical_outline(points: &[Vec2<i64>]) -> HashSet<Vec2<i64>> {
-    let ordered_points = get_points_in_order(points);
+fn get_max_x(points: &[Vec2<i64>]) -> i64 {
+    points.iter().map(|p| p.x).max().unwrap() + 1
+}
 
-    // println!("ordered points: {:?}", ordered_points);
-    let mut points_on_outline = HashSet::new();
 
-    for (p1, p2) in ordered_points
-        .iter()
-        .take(ordered_points.len() - 1)
-        .zip(ordered_points.iter().skip(1))
-    {
-        for x in p1.x.min(p2.x)..=p1.x.max(p2.x) {
-            for y in p1.y.min(p2.y)..=p1.y.max(p2.y) {
-                if p1.y == p2.y {
-                    continue;
-                }
-                points_on_outline.insert(Vec2::new(x, y));
-            }
-        }
-    }
-    // remove lines with an uneven amount of entries
-    let min_y = points_on_outline.iter().map(|p| p.y).min().unwrap();
-    let max_y = points_on_outline.iter().map(|p| p.y).max().unwrap();
+fn point_inside_shape(point: Vec2<i64>, outline: &HashSet<Vec2<i64>>, max_x: i64) -> bool {
+   if outline.contains(&point) {
+       return true;
+   }
+   
+   // println!("Checking point {point:?}");
+   // println!("Max x: {max_x}");
 
-    for y in min_y..max_y {
-        let mut points_on_row = points_on_outline
-            .iter()
-            .cloned()
-            .filter(|p| p.y == y)
-            .collect::<Vec<_>>();
-        if points_on_row.len() % 2 == 0 {
-            continue;
-        }
-        points_on_row.sort_by(|a, b| a.x.cmp(&b.x));
-        for i in (1..points_on_row.len()).step_by(2) {
-            points_on_outline.remove(&points_on_row[i]);
-        }
-    }
+   let mut intersections = 0;
+   let mut intersection_started = false;
+   let mut on_edge = false;
+   for x in point.x..=max_x {
+       let next_point = Vec2::new(x, point.y);
+       // println!("Probing cast at {next_point:?}");
 
-    points_on_outline
+       let on_outline = outline.contains(&next_point);
+       if on_outline && intersection_started {
+           on_edge = true;
+       }
+
+       if on_outline && !intersection_started {
+           // println!("Found intersection");
+           intersections += 1;
+           intersection_started = true;
+       }
+
+       if !on_outline && intersection_started {
+           // println!("reset intersection flag");
+           intersection_started = false;
+           if on_edge { 
+               // println!("reset on_edge flag, adding intersection");
+               intersections += 1;
+               on_edge = false;
+           }
+       }
+   }
+
+   // println!("Found {intersections} intersections for point {point:?}");
+
+   intersections % 2 == 1
+}
+
+fn get_direction_normal(from: Vec2<i64>, to: Vec2<i64>) -> Vec2<i64> {
+    let dir = to - from;
+
+    let x = dir.x / dir.x.abs().max(1);
+    let y = dir.y / dir.y.abs().max(1);
+
+    return Vec2::new(x, y);
 }
 
 fn get_points_in_order(points: &[Vec2<i64>]) -> Vec<Vec2<i64>> {
@@ -175,15 +221,19 @@ fn print_points(points: &HashSet<Vec2<i64>>) {
 
 #[cfg(test)]
 mod tests {
+    use crate::{common::math_2d::Vec2, year_2025::day_09::{get_max_x, get_points_on_outline, parse_points, point_inside_shape, print_points, rect_inside_shape}};
+
+    static EXAMPLE: &str = include_str!("example.txt");
+
     #[test]
     fn solve_example_part_1() {
-        let result = super::solve_part_1(include_str!("example.txt")).unwrap();
+        let result = super::solve_part_1(EXAMPLE).unwrap();
         assert_eq!(result, "50");
     }
 
     #[test]
     fn solve_example_part_2() {
-        let result = super::solve_part_2(include_str!("example.txt")).unwrap();
+        let result = super::solve_part_2(EXAMPLE).unwrap();
         assert_eq!(result, "24");
     }
 
@@ -192,4 +242,30 @@ mod tests {
         let result = super::solve_part_1(super::INPUT).unwrap();
         assert_eq!(result, "4749838800");
     }
+
+    #[test]
+    fn check_rect_in_shape() {
+        let input = EXAMPLE;
+        let points = parse_points(input).unwrap();
+        let max_x =  get_max_x(&points);
+        let outline = get_points_on_outline(&points);
+
+        assert!(point_inside_shape(Vec2::new(7, 1), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(7, 2), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(7, 3), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(8, 3), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(9, 3), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(10, 3), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(11, 3), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(11, 2), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(11, 1), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(10, 1), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(9, 1), &outline, max_x));
+        assert!(point_inside_shape(Vec2::new(8, 1), &outline, max_x));
+
+        assert!(!point_inside_shape(Vec2::new(0, 1), &outline, max_x));
+        assert!(!point_inside_shape(Vec2::new(6, 1), &outline, max_x));
+        assert!(!point_inside_shape(Vec2::new(0, 4), &outline, max_x));
+    }
+
 }
